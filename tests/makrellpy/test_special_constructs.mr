@@ -1,0 +1,96 @@
+
+{test "Partial application"
+    add = [x y] -> x + y
+    add2 = {add 2 _}
+    {assert {add2 3} == 5}
+
+    mul_xyz = [x y z] -> x * y * z
+    
+    mul2 = {mul_xyz _ 2 _}
+    {assert {mul2 3 5} == 30}
+
+    mul2_3 = {mul_xyz 2 _ 3}
+    {assert {mul2_3 5} == 30}
+}
+
+{test "Pipe"
+    s = [2 3 5] | sum
+    {print s}
+    {assert s == 10}
+
+    s = [2 3 5] | sum | [x] -> x * 2
+    {print s}
+    {assert s == 20}
+
+    mul = [x y] -> x * y
+    s = [2 3 5] | sum | {mul 3 _}
+    {print s}
+    {assert s == 30}
+
+    mul_xyz = [x y z] -> x * y * z
+    s = [2 3 5] | sum | {mul_xyz 2 _ 3}
+    {print s}
+    {assert s == 60}
+}
+
+{test "Reverse pipe"
+    s = sum \ [2 3 5]
+    {print s}
+    {assert s == 10}
+
+    s = ([x] -> x * 2) \ 3
+    {print s}
+    {assert s == 6}
+
+    f = [x] -> x * 5
+    s = f \ 7
+    {print s}
+    {assert s == 35}
+
+    s = x -> x * 11 \ 13
+    {print s}
+    {assert s == 143}
+
+    s = [x] -> x * 2 \ sum \ [2 3 5]
+    {print s}
+    {assert s == 20}
+
+    mul = [x y] -> x * y
+    s = {mul 3 _} \ sum \ [2 3 5]
+    {print s}
+    {assert s == 30}
+
+    mul_xyz = [x y z] -> x * y * z
+    s = {mul_xyz 2 _ 3} \ sum \ [2 3 5]
+    {print s}
+    {assert s == 60}
+}
+
+{test "Pipe map"
+    f = x -> x * 2
+
+    s = [2 3 5] |* f | list
+    {print s}
+    {assert s == [4 6 10]}
+
+    t = list \ f *\ [2 3 5]
+    {print t}
+    {assert t == [4 6 10]}
+}
+
+{test "Operators as functions"
+
+    mul = {*}
+    a = {mul 2 3}
+    {print a}
+    {assert a == 6}
+
+    add2 = {+ 2}
+    a = {add2 3}
+    {print a}
+    {assert a == 5}
+
+    a = 2 | {+ 3} | {* 5}
+    {print a}
+    {assert a == 25}
+}

@@ -1,0 +1,260 @@
+
+{test "Quote number"
+    {exec "from makrell.ast import Number"}
+    q = {quote 2}
+    {print q|type q}
+    {assert q == {Number "2" ""}}
+}
+
+{test "Quote string"
+    {exec "from makrell.ast import String"}
+    q = {quote "asd"}
+    {print q|type q}
+    {assert q == {String "\"asd\"" ""}}
+}
+
+{test "Quote list"
+    {exec "from makrell.ast import Number, SquareBrackets"}
+    q = {quote [2]}
+    {print q|type q}
+    {assert q == {SquareBrackets [{Number "2" ""}]}}
+}
+
+{test "Quote list"
+    {exec "from makrell.ast import Number, SquareBrackets"}
+    q = {quote [2]}
+    {print q|type q}
+    {assert q == {SquareBrackets [{Number "2" ""}]}}
+}
+
+{test "Quote curly brackets"
+    {exec "from makrell.ast import Identifier, CurlyBrackets"}
+    q = {quote {f}}
+    {print q|type q}
+    {assert q == {CurlyBrackets [{Identifier "f"}]}}
+}
+
+{test "Quote unquote"
+    {exec "from makrell.ast import Number"}
+    q = {quote {unquote 2}}
+    {print q|type q}
+    {assert q == 2}
+}
+
+{test "Quote $"
+    {exec "from makrell.ast import Number"}
+    q = {quote {$ 2}}
+    {print q|type q}
+    {assert q == 2}
+}
+
+# does not work
+# {test "Quote quote"
+#     {exec "from makrell.ast import Number, CurlyBrackets, Identifier, Whitespace"}
+#     q = {quote {quote 2}}
+#     {print q|type q}
+#     {assert q == {Number "2" ""}}
+# }
+
+{test "Meta_simple"
+    {meta
+        {print "Running in meta"}
+        mb = {quote 2}
+    }
+
+    a = mb
+    {print "a:" a}
+    {assert a == 2}
+
+    {meta
+        b3 = {quote b = 3}
+    }
+
+    b3
+    {print b}
+    {assert b == 3}
+
+    {meta
+        # does not work
+        # _a = 5
+        # c = {quote {unquote _a}}
+        c = {quote 5}
+        {print "c =" c}
+    }
+
+    a = c
+    {print a}
+    {assert a == 5}
+}
+
+{test "Meta function"
+    {meta
+        {fun second [ns]
+            ns = {regular ns}
+            ns@1
+        }
+    }
+
+    a = {second
+        2
+        3
+        5}
+    {print a}
+    {assert a == 3}
+
+    {meta
+        {fun pipe2 [ns]
+            {print "Running in meta ************************************"}
+            ns = {regular ns}
+            # {= ns {regular ns}}
+            {print ns}
+            {print ns@0}
+            {print ns@1}
+            {print {quote {unquote ns@0}}}
+            {quote {unquote ns@0} | {unquote ns@1}}
+        }
+    }
+    b = {pipe2
+            [2 3 5]
+            sum
+            64}
+    {print b}
+    {assert b == 10}
+
+    {meta
+        {fun pipe [ns]
+            ns = {regular ns}
+            p = ns@0
+            i = 1
+            {while i < {len ns}
+                p = {quote {unquote p} | {unquote ns@i}}
+                i = i+1
+            }
+            p
+        }
+    }
+
+    f = [x] -> x * 2
+    mul = [x y] -> x * y
+    c = {pipe 3 f f {mul 10 _} f f}
+    {print c}
+    {assert c == 480}
+}
+
+{test "Macro"
+    {macro pipe [ns]
+        ns = {regular ns}
+        p = ns@0
+        i = 1
+        {while i < {len ns}
+            p = {quote {unquote p} | {unquote ns@i}}
+            i = i+1
+        }
+        p
+    }
+
+    f = [x] -> x * 2
+    mul = [x y] -> x * y
+
+    c = {pipe 3 f f {mul 10 _} f f}
+
+    {print c}
+    {assert c == 480}
+}
+
+{test "RPN macro"
+    {macro rpn [nodes]
+        nodes = {regular nodes}
+        {fun transform [ns]
+            stack = []
+            {for n ns
+                {when {isinstance n Operator}
+                    b = {stack.pop}
+                    a = {stack.pop}
+                    binop = {BinOp a n.value b}
+                    {stack.append binop}
+                    {continue}
+                }
+                {when {isinstance n RoundBrackets}
+                    func = {stack.pop}
+                    args = {stack.pop}
+                    call = {CurlyBrackets [func] + args}
+                    {stack.append call}
+                    {continue}
+                }
+                {stack.append n}
+            }
+            stack
+        }
+        s = {transform nodes}
+        s@0
+    }
+
+    a = {rpn 2 3 * 5 7 * + }
+    {print a}
+    {assert a == 41}
+
+    b = {rpn
+        [[2 3 5]] sum ()
+    }
+    {print b}
+    {assert b == 10}
+
+    c = {rpn
+        [x y] x y + ->
+    }
+    cres = {c 2 3}
+    {print cres}
+    {assert cres == 5}
+}
+
+{test "Lisp macro"
+    {macro lisp [nodes]
+        nodes = {regular nodes}
+        {fun transform [n]
+
+            {when {isinstance n RoundBrackets}
+                ns = {regular n.nodes}
+                head = ns@0
+
+                {when {isinstance head Operator}
+                    a = {transform ns@1}
+                    i = 2
+                    {while i < {len ns}
+                        b = {transform ns@i}
+                        a = {BinOp a head.value b}
+                        i = i + 1}
+                    {return a}}
+
+                args = []
+                i = 1
+                {while i < {len ns}
+                    {args.append {transform ns@i}}
+                    i = i + 1}
+                {return {CurlyBrackets [{transform head}] + args}}}
+
+            {when {isinstance n SquareBrackets}
+                tns = n.nodes | {map transform _} | list
+                {return {SquareBrackets tns}}}
+
+            n}
+
+        {transform nodes@0}}
+
+    a = {lisp
+        (+ (* 2 3) (* 5 7) 11 13 17)}
+    {print a}
+    {assert a == 82}
+
+    b = {lisp
+        (do
+            (= f (-> [x] (* x x x)))
+            (sum [2 3 (* 5 (+ 7 (sum (map f [11 13]))))]))}
+    {print b}
+    {assert b == 17680}
+
+    c = 100 + {{lisp (-> [x y] (+ x y))} 2 3 * 5}
+    {print c}
+    {assert c == 117}
+}
+

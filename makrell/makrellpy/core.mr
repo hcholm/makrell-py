@@ -1,0 +1,28 @@
+
+{macro cond [ns]
+    ns = {$context.operator_parse {regular ns}}
+    {print "cond" ns}
+
+    i = {len ns} - 2
+    has_else = {len ns} % 2 == 1
+    value = {if has_else ns@(i + 1) {quote null}}
+    {when has_else
+        i = i - 1}
+    {while i >= 0
+        test = ns@i
+        testval = ns@(i + 1)
+        {print "test" test testval value}
+        value = {quote {if
+            {unquote test}
+            {unquote testval}
+            {unquote value}
+        }}
+        i = i - 2
+    }
+    value
+}
+
+
+{operator >> 100
+    [x] -> (x | $left | $right)
+}

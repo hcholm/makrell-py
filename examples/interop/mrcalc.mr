@@ -1,0 +1,5 @@
+{import pycalc@[mul]}
+
+{fun add [x y] x + y}
+
+{print "Running in mrcalc.mr:"  {add 2 3}}

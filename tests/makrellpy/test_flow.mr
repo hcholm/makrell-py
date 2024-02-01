@@ -1,0 +1,7 @@
+
+{test "if"
+    {assert {if true 2} == 2}
+    {assert {if false 2} == null}
+    {assert {if true 2 3} == 2}
+    {assert {if false 2 3} == 3}
+}

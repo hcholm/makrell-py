@@ -1,0 +1,1 @@
+print("examples.macros.__init__.py")

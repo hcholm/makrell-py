@@ -1,0 +1,44 @@
+{import cmd}
+{import makrell.makrellpy.compiler@[eval_src]}
+{import makrell.parsing@[Diagnostics]}
+{import makrell.baseformat@[src_to_baseformat]}
+
+{fun run []
+    {print "Makrell 0.8.0"}
+    
+    globals_ = {dict}
+    locals_ = {dict}
+    input_complete = true
+    src = ""
+    diag = {Diagnostics}
+
+    {while true
+        prompt = {if diag.is_incomplete
+            ". "
+            "> "}
+        inp = {input prompt}
+        src = src + inp
+
+        {diag.clear}
+        bf = {src_to_baseformat src diag}
+        {when diag.is_incomplete
+            continue}
+
+        {try
+            r = {eval_src src globals_ locals_}
+            {when r != null
+                {print r}}
+            {catch KeyboardInterrupt
+                {print "Keyboard interrupt"}
+                break
+            }
+            {catch e:Exception
+                {print e}
+            }
+            {finally
+                src = ""
+                {diag.clear}
+            }
+        }
+    }
+}

@@ -1,0 +1,152 @@
+
+{test "F x"
+    {fun f [x] x}
+    {print {f 2}}
+    {assert {f 2} == 2}
+}
+
+
+{test "F"
+    {fun f []}
+    {print {f}}
+    {assert {f} == null}
+}
+
+{test "Do blocks with multiple statements"
+    actual = {do
+        x = 2
+        y = 3
+    }
+    {print actual}
+    {assert actual == null}
+}
+
+{test "Do blocks with multiple statements and a return"
+    actual = {do
+        x = 2
+        y = 3
+        {return x + y}
+    }
+    {print actual}
+    {assert actual == 5}
+}
+
+{test "Do blocks with multiple statements and a return"
+    actual = {do
+        x = 2
+        y = 3
+        {return x + y}
+        z = 4
+    }
+    {print actual}
+    {assert actual == 5}
+}
+
+{*test "Nested do blocks"
+    actual = {do
+        x = 2
+        y = 3
+        {do
+            z = 4
+            x + y + z
+        }
+    }
+    {print actual}
+    {assert actual == 9}
+*}
+
+{*test "Nested do blocks 2"
+    actual = {do
+        x = 2
+        y = 3
+        {do
+            z = 4
+            {do
+                a = 5
+                x + y + z + a
+            }
+        }
+    }
+    {assert actual == 314}
+*}
+
+
+{test "Function calls"
+
+    {print "yay"}
+
+    {fun e [] 2}
+    {print {e}}
+    {assert {e} == 2}
+
+    {fun f [x y]
+         x + y
+    }
+
+    {print {f 2 3}}  # 5
+    {assert {f 2 3} == 5}
+
+    {fun g [x y]
+        x * y
+    }
+
+    {assert {g 2 3} == 6}
+
+    {print {f {g 2 3} 5}}  # 11
+
+    {fun apply [f x y]
+         {f x y}
+    }
+
+    {assert {apply f 2 3} == 5}
+    {assert {apply g 2 3} == 6}
+
+}
+
+{test "Lambdas"
+
+    f = [x y] -> x + y
+
+    {assert {f 2 3} == 5}
+
+    g = [x y] -> {do
+        {print "multiline lambda here"}
+        x * y
+    }
+
+    {print {g 2 3}}  # 6
+
+    {assert {g 2 3} == 6}
+
+    {print {f {g 2 3} 5}}  # 11
+
+    apply = [f2 x y] -> {f2 x y}
+
+    {print {apply f 2 3}}  # 5
+    {print {apply g 2 3}}  # 6
+
+    {assert {apply f 2 3} == 5}
+    {assert {apply g 2 3} == 6}
+
+    h = x -> x * x
+    {assert {h 3} == 9}
+}
+
+{test "Lambda immediate call"
+    x = {[x] -> x * 2
+            3}
+    {print x}
+    {assert x == 6}
+}
+
+{test "If"
+    a = {if true 1 2}
+    {assert a == 1}
+}
+
+{test "If else"
+    a = {if false 2 3}
+    {print a}
+    {assert a == 3}
+}
+

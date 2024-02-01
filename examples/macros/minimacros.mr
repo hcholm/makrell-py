@@ -1,0 +1,21 @@
+{import makrell.ast@[Number]}
+
+#  replace expression with the item count
+{macro macroa [ns]
+    ns = {regular ns}
+    {print "COMPILE-TIME MACROA There are" {len ns} "items here"}
+    count = {len ns}
+    {Number {str count} ""}
+    # {quote {print "There are" {unquote count} "items here"}}
+}
+
+#  replace expression with the item number 15
+{macro macrob [ns]
+    ns = {regular ns}
+    count = {len ns}
+    {print "COMPILE-TIME MACROB" count}
+    {print "COMPILE-TIME MACROB type:" {type ns@14} ns@14}
+    ns@14
+}
+
+z = 7

@@ -1,0 +1,18 @@
+
+"XML" [
+    {do
+        {fun ht [title colour]
+            span = #XML {span [style=(str "color: " colour)]}
+            span = {#XML {span [style=(str "color: " colour)]}}
+            span_attr = {#XML [style=(str "color: " colour)]}
+            #XML {html
+                {head
+                    {title $:title}
+                }
+                {body
+                    {h1 $:title}
+                    {p Dette {b er} en {span [style=(str "color: " $:colour)] test}.}
+            }
+        }
+    }    
+]

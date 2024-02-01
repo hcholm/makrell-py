@@ -1,0 +1,59 @@
+
+{test ">> operator"
+    add2 = { + 2}
+    mul3 = { * 3}
+    sub = {-}
+    add2mul3sub5 = add2 >> mul3 >> {sub _ 5}
+    a = 5 | add2mul3sub5
+    a | print
+    {assert a == 16}
+}
+
+{test "custom operators"
+    {operator 😐 100
+        $left + $right + 1}
+    {operator 😵 90
+        $left - $right}
+    {do
+        a = 2 😵 3 😐 5
+        a | print
+        {assert a == -7}
+        b = 2 | {😐 3}
+        b | print
+        {assert b == 6}
+    }
+}
+
+
+{test "cond macro"
+    a = {cond
+        true 2
+        false 3}
+    a | print
+    {assert a == 2}
+
+    b = {cond
+        false 2
+        true 3}
+    b | print
+    {assert b == 3}
+
+    c = {cond
+        a < b  a
+               b}
+    c | print
+    {assert c == 2}
+
+    d = {cond
+        a > b  a
+               b}
+    d | print
+    {assert d == 3}
+
+    e = {cond
+        {do {global a} {global b} a=a*2 b=b*2 a > b}  a
+        a < b  b
+               0}
+    e | print
+    {assert e == 6}  # ?
+}

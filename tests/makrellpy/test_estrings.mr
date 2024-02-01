@@ -1,0 +1,11 @@
+{test "E-strings"
+    s = "2 + 3 = {2 + 3}"e
+    {print s}
+    {assert s == "2 + 3 = 5"}
+}
+
+{test "E-strings 2"
+    s = "a{2 + 3}{{sum [5 7 11]}}{[13 17]|sum}"e
+    {print s}
+    {assert s == "a52330"}
+}

@@ -1,0 +1,6 @@
+[build-system]
+requires=[
+    "setuptools>=18",
+    "wheel",
+]
+

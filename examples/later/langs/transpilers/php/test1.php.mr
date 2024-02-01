@@ -1,0 +1,12 @@
+{php
+    {html
+        {head
+            {title PHP Test 1}
+        }
+        {body
+            {h1 PHP Test 1}
+            {p
+                2 + 2 = {$ 2 + 2;}
+        }
+    }
+}

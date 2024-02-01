@@ -1,0 +1,5 @@
+{import makrell._mron_py@[parse_nodes parse_src parse_file]}
+{importm makrell.mron@[mron]}
+
+d = {mron a 2 b 3}
+d|print

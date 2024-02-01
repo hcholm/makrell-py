@@ -1,0 +1,5 @@
+{import makrell.mron@[parse_file]}
+
+data = {parse_file "books.mron"}
+{print "All data:" data}
+{print "Second author:" (data.books@1).author}

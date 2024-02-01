@@ -1,0 +1,8 @@
+
+x = 2
+
+{fun px []
+    {print x}}
+
+{px}
+

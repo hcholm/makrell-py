@@ -1,0 +1,106 @@
+
+{defn test1
+    {do
+        x = 1
+        y = 3
+        p = {Point 1 3}}}
+
+skia: {
+    canvas: (100 100)
+    colour: skia.red
+    line: (10 20 30 40)
+    colour: skia.blue
+    line: (10 20) (30 50)
+    {
+        rotate: 12.6
+        colour: white
+        fill: black
+        rectangle: (20 20 30 30)
+        rotate: %x
+    }
+}
+
+{pipe
+	"vg.no"
+	wwwget
+	BS4
+	{$0.findall "a"}
+	{map _@href}
+	{filter {_.endswith ".pdf"}
+	{map (_.split: "/")@-1}
+	list
+	print
+}
+
+
+ht = #XML {html
+        {head
+            {title En test}
+        }
+        {body
+            {h1 En liten test}
+            {p Dette {b er} en {span style="color: red" test}.}
+        }
+    }
+
+
+(. a (b 1 2) c [d] [(e)])
+a.b(1, 2).c[d][e()]
+
+{a.b 1 2}.c@d@{e}
+
+
+(for [x [1]]
+   (print "In outer loop")
+   (while
+     (do
+       (print "In condition")
+       (break)
+       (print "This won't print.")
+       True)
+     (print "This won't print, either."))
+   (print "At end of outer loop"))
+
+
+{for x in [1]
+    {print "In outer loop}
+    {while
+        {do
+            {print "In condition"}
+            break
+            {print "This won't print."}
+            true
+        }
+        {print "This won't print, either."}
+    }
+    {print "At end of outer loop"}
+} 
+
+
+using System;
+
+namespace MyApplication
+{
+  class Program
+  {  
+    static void Main(string[] args)
+    {
+      Person myObj = new Person();
+      myObj.Name = "Liam";
+      Console.WriteLine(myObj.Name);
+    }
+  }
+}
+
+{using System}
+
+{namespace MyApplication
+
+    {class Program
+        {defn static void Main [args'(array@string)] :
+            myObj = {new Person}
+            myObj.Name = "Liam"
+            {Console.WriteLine myObj.Name}
+        }
+    }
+}

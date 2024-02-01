@@ -1,0 +1,15 @@
+
+is_multiple_of = [x y] -> x % y == 0
+
+{fun e0001 []
+    {print "0001"}
+    {range 1000} | {filter x -> x % 5 == 0 || x % 3 == 0 _} | sum
+    | print
+}
+
+{fun main []
+    {print "Euler 0001–0010"}
+    {e0001}
+}
+
+{main}

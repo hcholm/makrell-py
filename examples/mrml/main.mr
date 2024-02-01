@@ -1,0 +1,8 @@
+{import makrell.io@[read_file write_file]}
+{import makrell.mrml@[parse_to_xml]}
+
+src = {read_file "index.mrml"}
+xml = {parse_to_xml src}
+path = "html/index.html"
+{write_file path xml}
+{print "Wrote " path}

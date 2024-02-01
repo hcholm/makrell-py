@@ -1,0 +1,25 @@
+
+{fun times_message [n]
+    {if n == 1
+        "1 time"
+        n + " times"}
+}
+
+counter := 0
+
+elem := document.getElementById
+print := console.log
+on_loaded := f -> {document.addEventListener "DOMContentLoaded" f}
+
+{fun but_click []
+    counter = counter + 1
+    message := "You clicked " + {times_message counter} + "."
+    {print message}
+    {elem "but"}.text = message
+}
+
+{fun init []
+    {elem "but"}.onclick = but_click
+}
+
+{on_loaded init}

@@ -1,0 +1,57 @@
+{import skia}
+{import math}
+
+{print "Generating image ..."}
+
+surface_width = 100
+dot_count_x = 200
+dot_distance = surface_width / dot_count_x
+dot_size = 0.9 * dot_distance
+
+scale_factor = 15
+scale = [x] -> scale_factor * x
+
+{fun is_prime [n]
+    {when n < 2
+        {return false}}
+    {for i {range 2 n}
+        {when n % i == 0
+            {return false}}}
+    true}
+
+values = {list {filter is_prime {range dot_count_x ** 2}}}
+
+{fun init_canvas []
+    {global surface canvas paint}
+
+    surface = {skia.Surface {scale surface_width} {scale surface_width}}
+    canvas = {surface.getCanvas}
+    {canvas.clear skia.ColorYELLOW}
+
+    paint = {skia.Paint}
+    {paint.setAntiAlias true}
+    {paint.setColor skia.ColorRED}
+}
+
+{fun draw_dots []
+    draw_circle = [x y] -> {canvas.drawCircle (x y) {scale dot_size / 2} paint}
+    dot_pos = [ij] -> {scale dot_distance * (0.5 + ij)}
+
+    {for v values
+        j = {math.floor v / dot_count_x}
+        i = v % dot_count_x
+        {draw_circle {dot_pos i} {dot_pos j}}}
+}
+
+{fun save_image []
+    image = {surface.makeImageSnapshot}
+    path = "img/img1.png"
+    {image.save path skia.kPNG}
+    {print "Image saved to " path}
+}
+
+{init_canvas}
+{draw_dots}
+{save_image}
+{print "Done."}
+

@@ -1,0 +1,84 @@
+
+{test "Class"
+    {class C1
+        {fun __init__ [self x]
+            self.x = x
+        }
+        {fun get_x [self]
+            self.x
+        }
+    }
+
+    c = {C1 2}
+    {print c}
+    {print {c.get_x}}
+    {assert {c.get_x} == 2}
+}
+
+{test "Empty classes"
+    {class C1}
+    {class C2 []}
+    {class C3 [C1]}
+}
+
+{test "Class inheritance"
+    {class C1 []
+        {fun __init__ [self x]
+            self.x = x
+        }
+        {fun get_x [self]
+            self.x
+        }
+    }
+
+    {class C2 [C1]
+        {fun __init__ [self x y]
+            {{super}.__init__ x}
+            self.y = y
+        }
+        {fun get_y [self]
+            self.y
+        }
+    }
+
+    c = {C2 2 3}
+    {print {c.get_x}}
+    {assert {c.get_x} == 2}
+    {print {c.get_y}}
+    {assert {c.get_y} == 3}
+}
+
+{test "Class inheritance with attribute base"
+    {import cmd}
+    {class C [cmd.Cmd]}
+
+    c = {C}
+    {assert {hasattr c "cmdloop"}}
+}
+
+{test "Metaclass"
+    {class M [type]
+        {fun __new__ [cls name bases dct]
+            x = {{super}.__new__ cls name bases dct}
+            x.a = 2
+            x
+        }
+    }
+
+    {class C [metaclass=M]}
+
+    c = {C}
+    {assert c.a == 2}
+}
+
+# {test "Dataclass"
+
+#     {dataclass C1
+#         x: int
+#         y: int
+#     }
+
+#     c = {C1 2 3}
+#     {assert {c.x} == 2}
+#     {assert {c.y} == 3}
+# }

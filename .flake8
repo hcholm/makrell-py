@@ -1,0 +1,6 @@
+
+[flake8]
+max-line-length = 120
+# W293: Blank line contains whitespace
+# W503: Line break occurred before a binary operator
+ignore = W293, W503

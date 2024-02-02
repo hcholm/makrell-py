@@ -85,6 +85,21 @@ a | print
 b = 2 | {😐 3}
 b | print
 {assert b == 6}
+
+# A macro that composes a sequence of functions
+{macro pipe [ns]
+    ns = {regular ns}
+    p = ns@0
+    i = 1
+    {while i < {len ns}
+        p = {quote {unquote p} | {unquote ns@i}}
+        i = i+1
+    }
+    p
+}
+f = [x] -> x * 2
+mul = [x y] -> x * y
+c = {pipe 3 f f {mul 10 _} f f}  # 480
 ```
 
 Note:

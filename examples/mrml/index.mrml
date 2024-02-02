@@ -1,7 +1,10 @@
 {html
     {head
-        {title A Test}}
+        {title A Test}
+    }
     {body
         {h1 This is a Test}
-        {p [style="color: red"] Just some {b bold} text here.}}}
+        {p [style="color: red"] Just some {b bold} text here.}
+    }
+}
 

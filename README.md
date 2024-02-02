@@ -159,6 +159,22 @@ The above code corresponds to the following Python dictionary tree:
 }
 ```
 
+It's possible to embed MakrellPy code in MRON documents, and vice versa. Example:
+
+```
+a 2
+b {$ 3 + 5 }
+```
+
+This will be evaluated to this Python dictionary:
+
+```python
+{
+    "a": 2,
+    "b": 8
+}
+```
+
 ## MRML
 
 Sample MRML document:
@@ -187,6 +203,18 @@ The above code corresponds to the following HTML:
         <p style="color: red">Just some <b>bold</b> text here.</p>
     </body>
 </html>
+```
+
+It's possible to embed MakrellPy code in MRML documents, and vice versa. Example:
+
+```
+{a [b = {$ [2 3 5 7] | sum}] asd}
+```
+
+This will be evaluated to:
+
+```html
+<a b="17">asd</a>
 ```
 
 

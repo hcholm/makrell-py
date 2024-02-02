@@ -78,7 +78,7 @@ See the [examples](examples) and [tests](tests) directories for examples of the 
 * Meta programming, including macros, custom operators and embedded mini-languages
 * Python interoperability
 
-### TODOs and wishlist
+### TODOs, wishlist and ideas
 
 * More built-in functions and operators
 * Various missing Python features, such as decorators, yield and async/await
@@ -89,10 +89,12 @@ See the [examples](examples) and [tests](tests) directories for examples of the 
 * More documentation and examples
 * Transpilers and code generators for other languages   
 * Mini-languages for e.g. database queries, regular expressions etc.
+* A website with tutorials, documentation and a playground
+
 
 ## MRON
 
-Example MRON document:
+Sample MRON document:
 
 ```
 owner "Rena Holm"
@@ -135,7 +137,7 @@ The above code corresponds to the following Python dictionary tree:
 
 ## MRML
 
-Example MRML document:
+Sample MRML document:
 
 ```
 {html

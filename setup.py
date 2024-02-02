@@ -2,15 +2,18 @@ from setuptools import setup, find_packages
 
 setup(
     name='makrell',
-    version='0.8.0',
+    version='0.8.1',
     author='Hans-Christian Holm',
     author_email='jobb@hcholm.net',
     description='Makrell: A programming language family',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/hcholm/makrell-py',
-    # packages=find_packages(),
     packages=find_packages(exclude=["tests*"]),
+    package_data={
+        "makrell": ["*.mr"],
+        "makrell.makrellpy": ["*.mr"],
+    },
     entry_points={
         'console_scripts': [
             'makrell=makrell.cli:main',

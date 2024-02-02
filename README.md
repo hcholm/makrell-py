@@ -182,9 +182,9 @@ These element types are supported:
     * `2.5G` = 2,500,000,000
     * `2pi` = 6.283185307179586
 * **List**: A sequence of elements, surrounded by brackets and usually separated by spaces. Lists may be nested. There are three types of lists:
-    * **“Round”**, e.g. `(2 3 5)`
-    * **“Square”**, e.g. `["a" "b" "c"]`
-    * **“Curly”**, e.g. `{asd qwe zxc}`
+    * **"Round"**, e.g. `(2 3 5)`
+    * **"Square"**, e.g. `["a" "b" "c"]`
+    * **"Curly"**, e.g. `{asd qwe zxc}`
 * **Operator**: A symbol consisting of one or more non-alphanumeric characters. Examples:
     * `+`
     * `==`

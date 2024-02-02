@@ -113,6 +113,7 @@ See the [examples](examples) and [tests](tests) directories for examples of the 
 * Transpilers and code generators for other languages   
 * Mini-languages for e.g. database queries, regular expressions etc.
 * A website with tutorials, documentation and a playground
+* Implementations in other languages
 
 
 ## MRON

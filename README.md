@@ -9,6 +9,8 @@ Makrell is a family of programming languages implemented in Python. It consists 
 * **MRML** (Makrell Markup Language), a lightweight alternative to XML and HTML.
 * **Makrell Base Format**,  a simple data format that forms the basis for both MakrellPy, MRON and MRML.
 
+The project is in an early stage of development and is not yet ready for production use.
+
 ## Quick Start
 
 ### Installation
@@ -53,7 +55,8 @@ MakrellPy uses the Makrell Base Format as its base syntax (see below). MakrellPy
 a = 2
 b = a + 3
 {sum [a b 5]}  # function call
-[a b 5] | sum  # function call through pipe
+[a b 5] | sum  # function call by pipe operator
+sum \ [a b 5]  # function call by reverse pipe operator
 
 # Conditional expression
 {if a < b
@@ -61,8 +64,27 @@ b = a + 3
     "a is not less than b"}
 
 # Function definition
-{def add [x y]
+{fun add [x y]
     x + y}
+
+# Partial application
+add3 = {add 3 _}
+{add3 5}  # 8
+
+# Operators as functions
+a = 2 | {+ 3} | {* 5}  # 25
+
+# Custom operators
+{operator 😐 100
+    $left + $right + 1}
+{operator 😵 90
+    $left - $right}
+a = 2 😵 3 😐 5
+a | print
+{assert a == -7}
+b = 2 | {😐 3}
+b | print
+{assert b == 6}
 ```
 
 Note:
@@ -81,6 +103,7 @@ See the [examples](examples) and [tests](tests) directories for examples of the 
 ### TODOs, wishlist and ideas
 
 * More built-in functions and operators
+* Fix bugs
 * Various missing Python features, such as decorators, yield and async/await
 * Basic typing as in Python
 * Pattern matching and destructuring

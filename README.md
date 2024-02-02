@@ -74,7 +74,7 @@ add3 = {add 3 _}
 # Operators as functions
 a = 2 | {+ 3} | {* 5}  # 25
 
-# Custom operators
+# Custom operators with precedence levels
 {operator 😐 100
     $left + $right + 1}
 {operator 😵 90

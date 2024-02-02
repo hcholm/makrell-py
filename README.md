@@ -2,7 +2,7 @@
 
 <img src="./doc/makrell.png" style="width:10em" />
 
-Makrell is family of programming language implemented in Python. It consists currently of these languages:
+Makrell is a family of programming languages implemented in Python. It consists currently of these languages:
 
 * **MakrellPy**, a general-purpose programming language with two-way Python compatibility. It features a simple syntax, functional programming constructs and meta programming.
 * **MRON** (Makrell Object Notation), a lightweight alternative to JSON.

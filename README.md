@@ -7,7 +7,7 @@ Makrell is a family of programming languages implemented in Python. It consists 
 * **MakrellPy**, a general-purpose programming language with two-way Python compatibility. It features a simple syntax, functional programming constructs and meta programming.
 * **MRON** (Makrell Object Notation), a lightweight alternative to JSON.
 * **MRML** (Makrell Markup Language), a lightweight alternative to XML and HTML.
-* **Makrell Base Format**,  a simple data format that forms the basis for both MakrellPy, MRON and MRML.
+* **Makrell Base Format (MBF)**,  a simple data format that forms the basis for both MakrellPy, MRON and MRML.
 
 The project is in an early stage of development and is not yet ready for production use.
 
@@ -117,16 +117,19 @@ See the [examples](examples) and [tests](tests) directories for examples of the 
 
 ### TODOs, wishlist and ideas
 
-* More built-in functions and operators
+* More built-in functions, operators, data types etc.
 * Fix bugs
 * Various missing Python features, such as decorators, yield and async/await
-* Basic typing as in Python
+* Basic typing or type hints as in Python
 * Pattern matching and destructuring
-* More advanced typing, possibly unified with basic typing and grammar expressions
+* More advanced typing, possibly with inference and unified with pattern matching and grammar expressions in some mini-language
 * Better error messages and better IDE support
 * More documentation and examples
-* Transpilers and code generators for other languages   
-* Mini-languages for e.g. database queries, regular expressions etc.
+* Compilers and code generators for other languages and platforms
+* A composable query language for heterogeneous sources, such as databases, object structures, web services etc.
+* Mini-languages for regular expressions and BNF
+* An API for traversing and transforming MBF trees
+* A templating language
 * A website with tutorials, documentation and a playground
 * Implementations in other languages
 
@@ -141,13 +144,13 @@ last_update "2023-11-30"
 
 books [
     {
-        title "That Time of the Year Again"
-        year 1963
+        title  "That Time of the Year Again"
+        year   1963
         author "Norton Max"
     }
     {
-        title "One for the Team"
-        year 2024
+        title  "One for the Team"
+        year   2024
         author "Felicia X"
     }
 ]

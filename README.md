@@ -4,7 +4,7 @@
 
 Makrell is a family of programming languages implemented in Python. It consists currently of these languages:
 
-* **MakrellPy**, a general-purpose, functional programming language with two-way Python interoperability, metaprogramming support and simplistic syntax.
+* **MakrellPy**, a general-purpose, functional programming language with two-way Python interoperability, metaprogramming support and simple syntax.
 * **MRON** (Makrell Object Notation), a lightweight alternative to JSON.
 * **MRML** (Makrell Markup Language), a lightweight alternative to XML and HTML.
 * **Makrell Base Format (MBF)**,  a simple data format that forms the basis for both MakrellPy, MRON and MRML.

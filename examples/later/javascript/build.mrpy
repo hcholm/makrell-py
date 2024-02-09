@@ -1,7 +1,0 @@
-
-{when __name__ == "__main__"
-    out_dir  = "out"
-    out_path = {os.path.join out_dir _}
-    {mrjs_file_to_js_file   {out_path "test.mrjs"} {out_path "test.js"}}
-    {mrml_file_to_html_file {out_path "test.mrml"} {out_path "test.html"}}
-}

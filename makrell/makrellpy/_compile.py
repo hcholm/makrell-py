@@ -235,6 +235,16 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                 values = c(right)
                 f = c(left)
                 return py.Call(map_name, [f, values], [])
+            
+            case "~=" | "!~=":
+                py_value = c(left)
+                py_pattern = c(cc.meta.quote(right))
+                # call_func = py.Name("makrell.makrellpy.patmatch.match", py.Load())
+                call_func = py.Name("match", py.Load())
+                r = py.Call(call_func, [py_value, py_pattern], [])
+                if op == "!~=":
+                    r = py.UnaryOp(py.Not(), r)
+                return r
 
             case _:
                 return None

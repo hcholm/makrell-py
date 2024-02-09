@@ -13,6 +13,7 @@ mr_files = [
     'test_classes.mr',
     'test_flow.mr',
     'test_estrings.mr',
+    'test_patmatch.mr',
 ]
 
 

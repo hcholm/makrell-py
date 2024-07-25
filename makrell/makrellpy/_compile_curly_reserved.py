@@ -218,10 +218,10 @@ def compile_curly_reserved(n: Node, cc: CompilerContext, compile_mr, opp_nodes) 
                             eh = py.ExceptHandler(None, None, exnodes)
                             handlers.append(transfer_pos(n, eh))
                         else:
-                            if get_binop(nnodes[1], ":"):
+                            if nbo := get_binop(nnodes[1], ":"):
                                 # catch with name and type
-                                name = nnodes[1].left.value
-                                typ = c(nnodes[1].right)
+                                name = nbo.left.value
+                                typ = c(nbo.right)
                             else:
                                 # catch with name
                                 name = None

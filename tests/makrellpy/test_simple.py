@@ -35,6 +35,9 @@ def test_suffixes() -> None:
     run("2.5E", 2500000000000000000)
     run("2pi", 6.283185307179586)
 
+    run('"ff"hex', 0xff)
+    run('"A74FF"hex', 0xa74ff)
+
 
 def test_array() -> None:
     run("[]", [])

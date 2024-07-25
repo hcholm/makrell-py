@@ -55,7 +55,7 @@ def nodes_to_module(nodes: list[Node], cc: CompilerContext | None = None,
                     filename: str | None = None,
                     run_core: bool = True) -> py.Module:
     nodes = flatten(nodes)
-    cc = cc or CompilerContext()
+    cc = cc or CompilerContext(compile_mr)
     if run_core:
         run_core_mr(cc)
         cc.meta.node_blocks.clear()
@@ -84,7 +84,7 @@ def eval_nodes(ns: list[Node], cc: CompilerContext | None = None,
         ns = [ns]
     if len(ns) == 0:
         return None
-    cc = cc or CompilerContext()
+    cc = cc or CompilerContext(compile_mr)
     run_core_mr(cc)
     pyast = [compile_mr(n, cc) for n in ns]
     if not isinstance(pyast, list):
@@ -116,7 +116,7 @@ def eval_nodes(ns: list[Node], cc: CompilerContext | None = None,
 
 
 def exec_nodes(nodes: list[Node], filename: str | None = None) -> Any:
-    cc = CompilerContext()
+    cc = CompilerContext(compile_mr)
     m = nodes_to_module(nodes, cc, filename)
     if filename is None:
         filename = "<string>"

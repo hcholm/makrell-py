@@ -45,7 +45,8 @@ def dotted_ident(n: Node) -> str:
 
 
 class CompilerContext:
-    def __init__(self):
+    def __init__(self, compile_mr):
+        self.compile_mr = compile_mr
         self.gensym_counter = 0
         self.fun_defs = []
         self.operators = {}
@@ -72,7 +73,7 @@ class CompilerContext:
             self.meta.run(bf)
 
     def run(self, nodes: list[Node]) -> Any:
-        pyast = compile_mr(Sequence(nodes), self)
+        pyast = self.compile_mr(Sequence(nodes), self)
         if not isinstance(pyast, list):
             pyast = [pyast]
         pyast = self.fun_defs + pyast
@@ -108,7 +109,7 @@ from makrell.baseformat import operator_parse, src_to_baseformat
 
     def run(self, nodes: list[Node]) -> Any:
         self.node_blocks += nodes
-        pyast = compile_mr(Sequence(nodes), self.cc)
+        pyast = self.cc.compile_mr(Sequence(nodes), self.cc)
         if not isinstance(pyast, list):
             pyast = [pyast]
         pyast = self.cc.fun_defs + pyast

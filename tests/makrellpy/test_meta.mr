@@ -142,7 +142,7 @@
 }
 
 {test "Macro"
-    {macro pipe [ns]
+    {def macro pipe [ns]
         ns = {regular ns}
         p = ns@0
         i = 1
@@ -163,7 +163,7 @@
 }
 
 {test "RPN macro"
-    {macro rpn [nodes]
+    {def macro rpn [nodes]
         nodes = {regular nodes}
         {fun transform [ns]
             stack = []
@@ -209,7 +209,7 @@
 }
 
 {test "Lisp macro"
-    {macro lisp [nodes]
+    {def macro lisp [nodes]
         nodes = {regular nodes}
         {fun transform [n]
 

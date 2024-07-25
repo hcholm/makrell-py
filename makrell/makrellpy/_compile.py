@@ -594,15 +594,21 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                 q_py = c(q_mr)
                 return q_py
             
-            case "macro":
-                if parlen >= 2:
-                    f = Identifier("fun")
-                    cb = CurlyBrackets([f, *nodes[1:]])
-                    cb._original_nodes = original._original_nodes
-                    cc.meta.run([cb])
-                    return py.Pass()
+            case "def":
+                print(nodes)
+                if parlen >= 3:
+                    deftype = nodes[1].value
+                    match deftype:
+                        case "macro":
+                            f = Identifier("fun")
+                            cb = CurlyBrackets([f, *nodes[2:]])
+                            cb._original_nodes = original._original_nodes
+                            cc.meta.run([cb])
+                            return py.Pass()
+                        case _:
+                            raise Exception(f"Invalid def type: {deftype}")
                 else:
-                    raise Exception(f"Invalid number of arguments to macro: {parlen}")
+                    raise Exception(f"Invalid number of arguments to def: {parlen}")
 
     # curly brackets
     def curly(n: CurlyBrackets) -> py.AST | list[py.AST] | None:

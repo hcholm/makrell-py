@@ -68,7 +68,7 @@
         a < b  b
                0}
     e | print
-    {assert e == 6}  # ?
+    {assert e == 6}
 }
 
 

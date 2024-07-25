@@ -8,8 +8,8 @@ from makrell.baseformat import (
     src_to_baseformat, include_includes)
 from makrell.tokeniser import regular
 from makrell.parsing import (Diagnostics, flatten)
-
-from ._compile import (CompilerContext, compile_mr, stmt_wrap)
+from ._compiler_common import stmt_wrap
+from ._compile import (CompilerContext, compile_mr)
 
 
 def import_mr_module(name: str, dest_module, alias: str | None = None) -> py.Module:
@@ -19,7 +19,7 @@ def import_mr_module(name: str, dest_module, alias: str | None = None) -> py.Mod
     else:
         setattr(dest_module, name, m)
     
-    cc = CompilerContext()
+    cc = CompilerContext(compile_mr)
     run_core_mr(cc)
     pyast = cc.operator_parse(regular(src_to_baseformat(f"import {name}")))
     pyast = cc.fun_defs + pyast
@@ -38,7 +38,7 @@ def get_mr_meta_assignment(cc: CompilerContext) -> py.Assign | None:
     if len(syms) == 0:
         return None
     
-    def sym_to_pa(sym: Node) -> py.AST:
+    def sym_to_pa(sym: Node) -> py.expr:
         return py.Constant(str(sym))
     py_syms = [sym_to_pa(sym) for sym in syms]
     arr = py.List(py_syms, ctx=py.Load())
@@ -124,7 +124,7 @@ def exec_nodes(nodes: list[Node], filename: str | None = None) -> Any:
     c = compile(m, filename, mode="exec")
     glob = {}
     init_py = \
-"""import sys
+        """import sys
 sys.path.append('.')
 """
     exec(init_py, glob)

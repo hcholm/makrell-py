@@ -1,5 +1,5 @@
 import ast as py
-from typing import Any
+from typing import Any, cast
 from makrell.ast import (
     BinOp, Identifier, Number, Sequence, CurlyBrackets, Node, SquareBrackets, String)
 from makrell.baseformat import (
@@ -11,13 +11,13 @@ from makrell.parsing import (Diagnostics, get_identifier)
 def ensure_stmt(pa: py.AST) -> py.stmt:
     if isinstance(pa, py.stmt):
         return pa
-    e = py.Expr(pa)
+    e = py.Expr(cast(py.expr, pa))
     if "lineno" not in pa.__dict__:  # macro nodes don't have position info, TODO: fix
         return e
-    e.lineno = pa.lineno
-    e.col_offset = pa.col_offset
-    e.end_lineno = pa.end_lineno
-    e.end_col_offset = pa.end_col_offset
+    e.lineno = pa.lineno  # type: ignore
+    e.col_offset = pa.col_offset  # type: ignore
+    e.end_lineno = pa.end_lineno  # type: ignore
+    e.end_col_offset = pa.end_col_offset  # type: ignore
     return e
 
 
@@ -42,10 +42,10 @@ def dotted_ident(n: Node) -> str:
 
 def transfer_pos(n: Node, pa: py.AST) -> py.AST:
     try:
-        pa.lineno = n._start_line
-        pa.col_offset = n._start_column
-        pa.end_lineno = n._end_line
-        pa.end_col_offset = n._end_column
+        pa.lineno = n._start_line  # type: ignore
+        pa.col_offset = n._start_column  # type: ignore
+        pa.end_lineno = n._end_line  # type: ignore
+        pa.end_col_offset = n._end_column  # type: ignore
     except AttributeError:
         pass
     return pa

@@ -191,7 +191,7 @@ def is_tuple(n: Node) -> bool:
     return (isinstance(n, RoundBrackets) and len(n.nodes) > 1)
 
 
-def assert_tuple(n: Node) -> RoundBrackets:
+def assert_tuple(n: RoundBrackets) -> RoundBrackets:
     if not is_tuple(n):
         raise Exception(f"Expected tuple, got: {n}")
     if len(n) == 2 and get_identifier(n[1], "_"):
@@ -232,8 +232,8 @@ def get_curly_brackets(n: Node, require: bool = False) -> CurlyBrackets | None:
 
 def get_curly(n: Node, ident: str, require: bool = False) -> CurlyBrackets | None:
     if (not isinstance(n, CurlyBrackets)
-        or len(n.nodes) < 1
-        or not get_identifier(n.nodes[0], ident, require)):
+            or len(n.nodes) < 1
+            or not get_identifier(n.nodes[0], ident, require)):
         if require:
             raise not_found_error(CurlyBrackets, None, n)
         return None

@@ -10,9 +10,9 @@
 }
 
 {test "custom operators"
-    {operator 😐 100
+    {def operator 😐 100
         $left + $right + 1}
-    {operator 😵 90
+    {def operator 😵 90
         $left - $right}
     {do
         a = 2 😵 3 😐 5

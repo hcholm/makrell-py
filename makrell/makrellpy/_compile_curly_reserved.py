@@ -1,14 +1,15 @@
 import ast as py
 from importlib import import_module
 from makrell.ast import (Identifier, Sequence, CurlyBrackets, Node)
-from makrell.baseformat import (operator_parse)
+from makrell.baseformat import (Associativity, operator_parse)
 from makrell.makrellpy._compiler_common import CompilerContext
 from makrell.tokeniser import regular
 from makrell.parsing import (get_binop, get_curly, get_square_brackets, flatten, get_identifier)
 from ._compiler_common import dotted_ident, stmt_wrap, transfer_pos
 
 
-def compile_curly_reserved(n: Node, cc: CompilerContext, compile_mr, opp_nodes) -> py.AST | list[py.AST] | None:
+def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, opp_nodes) -> py.AST | list[py.AST] | None:
+    reg_nodes = regular(n.nodes)
     nodes = opp_nodes
     original = n
 
@@ -294,7 +295,7 @@ def compile_curly_reserved(n: Node, cc: CompilerContext, compile_mr, opp_nodes) 
         case "async":
             if parlen == 1:
                 return py.AsyncFunctionDef(nodes[1].value, py.arguments([], None, None, []),
-                                            [c(nodes[2])], [])
+                                           [c(nodes[2])], [])
             else:
                 raise Exception(f"Invalid number of arguments to async: {parlen}")
             
@@ -358,16 +359,37 @@ def compile_curly_reserved(n: Node, cc: CompilerContext, compile_mr, opp_nodes) 
             return q_py
         
         case "def":
+            print(reg_nodes)
             print(nodes)
-            if parlen >= 3:
-                deftype = nodes[1].value
+            if len(reg_nodes) >= 3:
+                deftype = reg_nodes[1].value
                 match deftype:
+
                     case "macro":
                         f = Identifier("fun")
-                        cb = CurlyBrackets([f, *nodes[2:]])
+                        cb = CurlyBrackets([f, *reg_nodes[2:]])
                         cb._original_nodes = original._original_nodes  # type: ignore
                         cc.meta.run([cb])
                         return py.Pass()
+                    
+                    case "operator":
+                        if len(reg_nodes) < 3:
+                            raise Exception(f"Invalid number of arguments to operator: {len(reg_nodes)}")
+                        is_rass = get_identifier(reg_nodes[3], "rightassoc")
+                        op = reg_nodes[2].value
+                        precedence = int(reg_nodes[3].value)
+                        associativity = Associativity.RIGHT if is_rass else Associativity.LEFT
+                        cc.operators[op] = (precedence, associativity)
+
+                        expr_start = 5 if is_rass else 4
+                        expr_nodes = reg_nodes[expr_start:]
+                        body = c(operator_parse(expr_nodes, cc.op_precedence)[0])
+                        arguments = py.arguments(args=[py.arg("$left"), py.arg("$right")], posonlyargs=[],
+                                                 kwonlyargs=[], kw_defaults=[], defaults=[])
+                        expr = py.Lambda(arguments, body)
+                        cc.meta.symbols[op] = expr
+                        return py.Pass()
+                    
                     case _:
                         raise Exception(f"Invalid def type: {deftype}")
             else:

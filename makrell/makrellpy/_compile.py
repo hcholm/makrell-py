@@ -53,25 +53,6 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
             r = py.Lambda(arguments, body)
             return r
 
-        # operator definition
-        if get_identifier(n0, "operator"):
-            if len(reg_nodes) < 3:
-                raise Exception(f"Invalid number of arguments to operator: {len(reg_nodes)}")
-            is_rass = get_identifier(reg_nodes[3], "rightassoc")
-            op = reg_nodes[1].value
-            precedence = int(reg_nodes[2].value)
-            associativity = Associativity.RIGHT if is_rass else Associativity.LEFT
-            cc.operators[op] = (precedence, associativity)
-
-            expr_start = 4 if is_rass else 3
-            expr_nodes = reg_nodes[expr_start:]
-            body = c(operator_parse(expr_nodes, cc.op_precedence)[0])
-            arguments = py.arguments(args=[py.arg("$left"), py.arg("$right")], posonlyargs=[],
-                                     kwonlyargs=[], kw_defaults=[], defaults=[])
-            expr = py.Lambda(arguments, body)
-            cc.meta.symbols[op] = expr
-            return py.Pass()
-
         opp_nodes = cc.operator_parse(reg_nodes)
         opp_n0 = opp_nodes[0]
 

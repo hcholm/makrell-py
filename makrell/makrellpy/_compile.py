@@ -265,13 +265,28 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                     raise Exception(f"Invalid number of arguments to not: {parlen}")
                 
             case "if":
-                if parlen == 2:
-                    return py.IfExp(c(nodes[1]), c(nodes[2]), py.Constant(None))
-                elif parlen == 3:
-                    return py.IfExp(c(nodes[1]), c(nodes[2]), c(nodes[3]))
-                else:
-                    cc.diag.error(0, f"Invalid number of arguments to if: {parlen}", n0)
+                pars = regular(nodes[1:])
+                if len(pars) == 0:
+                    cc.diag.error(0, "No arguments to if.", n0)
                     return None
+                if len(pars) == 1:
+                    return py.Constant(None)
+                
+                def iff(ps: list[Node]) -> py.AST:
+                    if len(ps) == 0:
+                        return py.Constant(None)
+                    if len(ps) == 1:
+                        return c(ps[0])
+                    return py.IfExp(c(ps[0]), c(ps[1]), iff(ps[2:]))
+                
+                return iff(pars)
+                # if parlen == 2:
+                #     return py.IfExp(c(nodes[1]), c(nodes[2]), py.Constant(None))
+                # elif parlen == 3:
+                #     return py.IfExp(c(nodes[1]), c(nodes[2]), c(nodes[3]))
+                # else:
+                #     cc.diag.error(0, f"Invalid number of arguments to if: {parlen}", n0)
+                #     return None
                 
             case "when":
                 body = stmt_wrap([c(n) for n in regular(nodes[2:])], auto_return=False)

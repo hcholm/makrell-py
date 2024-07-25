@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from typing import Any
 from makrell.makrellpy.compiler import eval_src
 
@@ -37,6 +38,8 @@ def test_suffixes() -> None:
 
     run('"ff"hex', 0xff)
     run('"A74FF"hex', 0xa74ff)
+
+    # run('"2024-07-26"dt', datetime(2024, 7, 26))
 
 
 def test_array() -> None:

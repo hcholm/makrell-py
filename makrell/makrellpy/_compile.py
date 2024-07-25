@@ -77,7 +77,6 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
 
         if get_identifier(n0):
             # reserved word
-            # r = mr_curly_reserved(n, opp_nodes)
             r = compile_curly_reserved(n, cc, compile_mr, opp_nodes)
             if r:
                 return r

@@ -6,6 +6,7 @@ from makrell.makrellpy._compiler_common import CompilerContext
 from makrell.tokeniser import regular
 from makrell.parsing import (get_binop, get_curly, get_square_brackets, flatten, get_identifier)
 from ._compiler_common import dotted_ident, stmt_wrap, transfer_pos
+import makrell.makrellpy.pyast_builder as pb
 
 
 def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, opp_nodes) -> py.AST | list[py.AST] | None:
@@ -32,7 +33,7 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
     match n0.value:
         case "not":
             if parlen == 1:
-                return py.UnaryOp(py.Not(), c(nodes[1]))
+                return pb.xnot(c(nodes[1]))
             else:
                 raise Exception(f"Invalid number of arguments to not: {parlen}")
 
@@ -42,20 +43,20 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
                 cc.diag.error(0, "No arguments to if.", n0)
                 return None
             if len(pars) == 1:
-                return py.Constant(None)
+                return pb.constant(None)
             
             def iff(ps: list[Node]) -> py.expr:
                 if len(ps) == 0:
-                    return py.Constant(None)
+                    return pb.constant(None)
                 if len(ps) == 1:
                     return c(ps[0])
-                return py.IfExp(c(ps[0]), c(ps[1]), iff(ps[2:]))
+                return pb.ifexp(c(ps[0]), c(ps[1]), iff(ps[2:]))
             
             return iff(pars)
             
         case "when":
             body = stmt_wrap([c(n) for n in regular(nodes[2:])], auto_return=False)
-            return py.If(c(nodes[1]), body, [])
+            return pb.if_(c(nodes[1]), body)
 
         case "while":
             if parlen >= 2:
@@ -167,9 +168,9 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
 
         case "return":
             if parlen == 0:
-                return py.Return(py.Constant(None))
+                return pb.return_()
             elif parlen == 1:
-                return py.Return(c(nodes[1]))
+                return pb.return_(c(nodes[1]))
             else:
                 cc.diag.error(0, f"Invalid number of arguments to return: {parlen}", n0)
                 return None
@@ -260,25 +261,25 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
             
         case "assert":
             if parlen == 1:
-                return py.Assert(c(nodes[1]), None)
+                return pb.assert_(c(nodes[1]))
             elif parlen == 2:
-                return py.Assert(c(nodes[1]), c(nodes[2]))
+                return pb.assert_(c(nodes[1]), c(nodes[2]))
             else:
                 raise Exception(f"Invalid number of arguments to assert: {parlen}")
             
         case "pass":
             if parlen == 0:
-                return py.Pass()
+                return pb.pass_()
             else:
                 raise Exception(f"Invalid number of arguments to pass: {parlen}")
             
         case "break":
             if parlen == 0:
-                return py.Break()
+                return pb.break_()
             
         case "continue":
             if parlen == 0:
-                return py.Continue()
+                return pb.continue_()
             
         case "global":
             if parlen >= 1:
@@ -351,7 +352,7 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
 
         case "meta":
             cc.meta.run(cc.operator_parse(regular(nodes[1:])))
-            return py.Pass()
+            return pb.pass_()
         
         case "quote":
             q_mr = cc.meta.quote(regular(flatten(nodes[1]))[0])
@@ -370,7 +371,7 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
                         cb = CurlyBrackets([f, *reg_nodes[2:]])
                         cb._original_nodes = original._original_nodes  # type: ignore
                         cc.meta.run([cb])
-                        return py.Pass()
+                        return pb.pass_()
                     
                     case "operator":
                         if len(reg_nodes) < 3:
@@ -384,11 +385,10 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
                         expr_start = 5 if is_rass else 4
                         expr_nodes = reg_nodes[expr_start:]
                         body = c(operator_parse(expr_nodes, cc.op_precedence)[0])
-                        arguments = py.arguments(args=[py.arg("$left"), py.arg("$right")], posonlyargs=[],
-                                                 kwonlyargs=[], kw_defaults=[], defaults=[])
-                        expr = py.Lambda(arguments, body)
+                        arguments = ["$left", "$right"]
+                        expr = pb.lambda_(arguments, body)
                         cc.meta.symbols[op] = expr
-                        return py.Pass()
+                        return pb.pass_()
                     
                     case "pattern":
                         raise Exception("Pattern matching not implemented.")

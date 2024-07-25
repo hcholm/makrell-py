@@ -3,7 +3,7 @@ import ast
 
 # Literals
 
-def const(value):
+def constant(value):
     return ast.Constant(value)
 
 def list_ld(elts: list[ast.expr]) -> ast.List:
@@ -37,6 +37,11 @@ def uadd() -> ast.unaryop: return ast.UAdd()
 def usub() -> ast.unaryop: return ast.USub()
 def not_() -> ast.unaryop: return ast.Not()
 def invert() -> ast.unaryop: return ast.Invert()
+
+def xuadd(x) -> ast.expr: return unaryop(uadd(), x)
+def xusub(x) -> ast.expr: return unaryop(usub(), x)
+def xnot(x) -> ast.expr: return unaryop(not_(), x)
+def xinvert(x) -> ast.expr: return unaryop(invert(), x)
 
 def binop(left: ast.expr, op: ast.operator, right: ast.expr) -> ast.expr:
     return ast.BinOp(left, op, right)
@@ -82,6 +87,9 @@ def call(func: ast.expr | str, args: list[ast.expr] = [], keywords: list[ast.key
 
 def keyword(arg: str, value: ast.expr) -> ast.keyword:
     return ast.keyword(arg, value)
+
+def ifexp(test: ast.expr, body: ast.expr, orelse: ast.expr) -> ast.IfExp:
+    return ast.IfExp(test, body, orelse)
 
 def attribute_ld(value: ast.expr, attr: str) -> ast.Attribute:
     return ast.Attribute(value, attr, ast.Load())
@@ -140,6 +148,21 @@ def pass_() -> ast.Pass:
 # Imports
 
 # Control flow
+
+def if_(test: ast.expr, body: list[ast.stmt], orelse: list[ast.stmt] = []) -> ast.If:
+    return ast.If(test, body, orelse)
+
+def for_(target: ast.expr, iter: ast.expr, body: list[ast.stmt], orelse: list[ast.stmt] = []) -> ast.For:
+    return ast.For(target, iter, body, orelse)
+
+def while_(test: ast.expr, body: list[ast.stmt], orelse: list[ast.stmt] = []) -> ast.While:
+    return ast.While(test, body, orelse)
+
+def break_() -> ast.Break:
+    return ast.Break()
+
+def continue_() -> ast.Continue:
+    return ast.Continue()
 
 # Pattern matching
 

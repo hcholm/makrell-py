@@ -5,7 +5,7 @@ from makrell.makrellpy._compiler_common import stmt_wrap, transfer_pos
 from makrell.tokeniser import regular
 from makrell.parsing import (get_binop, get_square_brackets, get_identifier)
 from .py_primitives import bin_ops, bool_ops, compare_ops
-
+import makrell.makrellpy.pyast_builder as pb
 
 def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
     left = n.left
@@ -27,39 +27,38 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
 
         if op in cc.meta.symbols:
             mop = cc.meta.symbols[op]  # lambda
-            return py.Call(mop, [c(left), c(right)], [])
+            return pb.call(mop, [c(left), c(right)])
 
         match op:
             case "->":
                 name = cc.gensym()
                 if aid := get_identifier(left):
-                    a = [py.arg(aid.value)]
+                    args = aid.value
                 elif asb := get_square_brackets(left):
-                    a = [py.arg(n.value) for n in regular(asb.nodes)]
+                    args = [n.value for n in regular(asb.nodes)]
                 else:
                     raise Exception(f"Invalid left side of ->: {left}")
-                args = py.arguments(args=a, posonlyargs=[], kwonlyargs=[], kw_defaults=[],
-                                    defaults=[])
+                
                 if isinstance(right, Sequence) and len(right.nodes) > 1 and get_identifier(right.nodes[0], "do"):
                     rnodes = regular(right.nodes)
                     body = stmt_wrap([c(n) for n in cc.operator_parse(rnodes[1:])])
-                    f = py.FunctionDef(name, args, body, [])
+                    f = pb.function_def(name, args, body)
                     cc.fun_defs.append(f)
-                    return py.Name(name, py.Load())
+                    return pb.name_ld(name)
                 else:
-                    return py.Lambda(args, c(right))
+                    return pb.lambda_(args, c(right))
 
             case "@":
                 right = deparen(right)
                 if get_binop(right, ".."):
                     slice = c(right)
-                    s = py.Subscript(c(left), py.Slice(slice), py.Load())
+                    s = pb.subscript_ld(c(left), pb.slice(slice))
                 else:
-                    s = py.Subscript(c(left), c(right), py.Load())
+                    s = pb.subscript_ld(c(left), c(right))
                 return s
             
             case "..":
-                return py.Slice(c(left), c(right), None)
+                return pb.slice(c(left), c(right))
             
             case ".":
                 return py.Attribute(c(left), right.value, py.Load())
@@ -67,34 +66,31 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
             case "=":
                 c_left = c(left)
                 c_left.ctx = py.Store()
-                return py.Assign([c_left], c(right))
+                return pb.assign([c_left], c(right))
             
             case "|":
-                return py.Call(c(right), [c(left)], [])
+                return pb.call(c(right), [c(left)])
             
             case "|*":
-                map_name = py.Name("map", py.Load())
                 values = c(left)
                 f = c(right)
-                return py.Call(map_name, [f, values], [])
+                return pb.call('map', [f, values])
             
             case "\\":
-                return py.Call(c(left), [c(right)], [])
+                return pb.call(c(left), [c(right)])
             
             case "*\\":
-                map_name = py.Name("map", py.Load())
                 values = c(right)
                 f = c(left)
-                return py.Call(map_name, [f, values], [])
+                return pb.call('map', [f, values])
             
             case "~=" | "!~=":
                 py_value = c(left)
                 py_pattern = c(cc.meta.quote(right))
                 # call_func = py.Name("makrell.makrellpy.patmatch.match", py.Load())
-                call_func = py.Name("match", py.Load())
-                r = py.Call(call_func, [py_value, py_pattern], [])
+                r = pb.call('match', [py_value, py_pattern])
                 if op == "!~=":
-                    r = py.UnaryOp(py.Not(), r)
+                    r = pb.unaryop(pb.not_(), r)
                 return r
 
             case _:
@@ -102,12 +98,12 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
 
     # python operator
     if op in bin_ops:
-        return py.BinOp(c(left), bin_ops[op], c(right))
+        return pb.binop(c(left), bin_ops[op], c(right))
     elif op in bool_ops:
         n._type = Identifier("bool")
-        return py.BoolOp(bool_ops[op], [c(left), c(right)])
+        return pb.boolop(bool_ops[op], [c(left), c(right)])
     elif op in compare_ops:
-        return py.Compare(c(left), [compare_ops[op]], [c(right)])
+        return pb.compare(c(left), [compare_ops[op]], [c(right)])
     elif op in cc.operators:
         # makrell operator
         return mr_binop(left, op, right)

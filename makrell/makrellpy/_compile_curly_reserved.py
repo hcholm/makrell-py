@@ -390,6 +390,18 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
                         cc.meta.symbols[op] = expr
                         return py.Pass()
                     
+                    case "pattern":
+                        raise Exception("Pattern matching not implemented.")
+                    
+                    case "strsuffix":
+                        raise Exception("String suffix not implemented.")
+                    
+                    case "intsuffix":
+                        raise Exception("Int suffix not implemented.")
+                    
+                    case "floatsuffix":
+                        raise Exception("Float suffix not implemented.")
+                    
                     case _:
                         raise Exception(f"Invalid def type: {deftype}")
             else:

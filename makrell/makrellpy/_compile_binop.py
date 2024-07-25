@@ -13,7 +13,7 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
     op = n.op
 
     # recurse through this
-    def c(n: Node) -> py.AST | list[py.AST] | None:
+    def c(n: Node) -> py.expr:  # py.AST | list[py.AST] | None:
         pa = compile_mr(n, cc)
         if pa is not None:
             if isinstance(pa, list):
@@ -21,7 +21,7 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
                     transfer_pos(n, p)
             else:
                 transfer_pos(n, pa)
-        return pa
+        return pa  # type: ignore
 
     def mr_binop(left: Node, op: str, right: Node) -> py.AST | list[py.AST] | None:
 
@@ -32,10 +32,10 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
         match op:
             case "->":
                 name = cc.gensym()
-                if get_identifier(left):
-                    a = [py.arg(left.value)]
-                elif get_square_brackets(left):
-                    a = [py.arg(n.value) for n in regular(left.nodes)]
+                if aid := get_identifier(left):
+                    a = [py.arg(aid.value)]
+                elif asb := get_square_brackets(left):
+                    a = [py.arg(n.value) for n in regular(asb.nodes)]
                 else:
                     raise Exception(f"Invalid left side of ->: {left}")
                 args = py.arguments(args=a, posonlyargs=[], kwonlyargs=[], kw_defaults=[],

@@ -26,7 +26,7 @@ def dotted_ident(n: Node) -> str:
 def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
 
     # recurse through this
-    def c(n: Node) -> py.AST | list[py.AST] | None:
+    def c(n: Node) -> py.expr:  # py.AST | list[py.AST] | None:
         pa = compile_mr(n, cc)
         if pa is not None:
             if isinstance(pa, list):
@@ -34,7 +34,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                     transfer_pos(n, p)
             else:
                 transfer_pos(n, pa)
-        return pa
+        return pa  # type: ignore
 
     # reserved words, special forms
     def mr_curly_reserved(original: Node, nodes: list[Node]) -> py.AST | list[py.AST] | None:
@@ -59,7 +59,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                 if len(pars) == 1:
                     return py.Constant(None)
                 
-                def iff(ps: list[Node]) -> py.AST:
+                def iff(ps: list[Node]) -> py.expr:
                     if len(ps) == 0:
                         return py.Constant(None)
                     if len(ps) == 1:

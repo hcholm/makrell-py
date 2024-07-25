@@ -1,18 +1,14 @@
 import ast as py
-from importlib import import_module
 from typing import Any
 from makrell.ast import (
-    BinOp, Identifier, Number, Sequence, CurlyBrackets, Node, RoundBrackets,
-    SquareBrackets, String)
+    BinOp, Identifier, Number, Sequence, CurlyBrackets, Node, SquareBrackets, String)
 from makrell.baseformat import (
-    Associativity, ParseError, default_precedence_lookup, deparen, operator_parse, src_to_baseformat)
+    Associativity, default_precedence_lookup, operator_parse, src_to_baseformat)
 from makrell.tokeniser import regular
-from makrell.parsing import (
-    Diagnostics, get_binop, get_curly, get_operator, get_square_brackets, python_value, flatten, get_identifier)
-from .py_primitives import bin_ops, bool_ops, compare_ops, simple_reserved
+from makrell.parsing import (Diagnostics, get_identifier)
 
 
-def ensure_stmt(pa: py.AST) -> py.AST:
+def ensure_stmt(pa: py.AST) -> py.stmt:
     if isinstance(pa, py.stmt):
         return pa
     e = py.Expr(pa)
@@ -25,7 +21,7 @@ def ensure_stmt(pa: py.AST) -> py.AST:
     return e
 
 
-def stmt_wrap(ns: list[py.AST], auto_return: bool = True) -> list[py.AST]:
+def stmt_wrap(ns: list[py.AST], auto_return: bool = True) -> list[py.stmt]:
     if ns == []:
         return [py.Return(py.Constant(None))]
     return [
@@ -36,12 +32,23 @@ def stmt_wrap(ns: list[py.AST], auto_return: bool = True) -> list[py.AST]:
 
 
 def dotted_ident(n: Node) -> str:
-    if get_identifier(n):
-        return n.value
+    if aid := get_identifier(n):
+        return aid.value
     elif isinstance(n, BinOp) and n.op == ".":
         return dotted_ident(n.left) + "." + dotted_ident(n.right)
     else:
         raise Exception(f"Invalid identifier: {n}")
+
+
+def transfer_pos(n: Node, pa: py.AST) -> py.AST:
+    try:
+        pa.lineno = n._start_line
+        pa.col_offset = n._start_column
+        pa.end_lineno = n._end_line
+        pa.end_col_offset = n._end_column
+    except AttributeError:
+        pass
+    return pa
 
 
 class CompilerContext:
@@ -148,14 +155,3 @@ from makrell.baseformat import operator_parse, src_to_baseformat
             case n if isinstance(n, int):
                 return Number(str(n))
         self.cc.diag.error(f"Invalid node to quote: {n}")
-
-
-def transfer_pos(n: Node, pa: py.AST) -> py.AST:
-    try:
-        pa.lineno = n._start_line
-        pa.col_offset = n._start_column
-        pa.end_lineno = n._end_line
-        pa.end_col_offset = n._end_column
-    except AttributeError:
-        pass
-    return pa

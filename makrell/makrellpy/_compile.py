@@ -36,21 +36,18 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
 
         # operator as function call
         if get_operator(reg_nodes[0]):
-            # TODO: more arguments
+            op = reg_nodes[0].value
             if len(reg_nodes) == 1:
-                argname1 = "$left"
-                argname2 = "$right"
-                args = [py.arg(argname1), py.arg(argname2)]
-                body = c(BinOp(Identifier(argname1), reg_nodes[0].value, Identifier(argname2)))
+                # {+}
+                args = ['$left', '$right']
+                body = c(BinOp(Identifier(args[0]), op, Identifier(args[1])))
             elif len(reg_nodes) == 2:
-                argname1 = "$left"
-                args = [py.arg(argname1)]
-                body = c(BinOp(reg_nodes[1], reg_nodes[0].value, Identifier(argname1)))
+                # {+ 2}
+                args = '$left'
+                body = c(BinOp(reg_nodes[1], op, Identifier(args)))
             else:
                 raise Exception(f"Invalid number of arguments to operator: {len(reg_nodes)}")
-            arguments = py.arguments(args=args, posonlyargs=[], kwonlyargs=[],
-                                     kw_defaults=[], defaults=[])
-            r = py.Lambda(arguments, body)
+            r = pb.lambda_(args, body)
             return r
 
         opp_nodes = cc.operator_parse(reg_nodes)

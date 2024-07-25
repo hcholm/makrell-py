@@ -113,6 +113,10 @@
     {print a}
     {assert a == 6}
 
+    a = {{*} 5 7}
+    {print a}
+    {assert a == 35}
+
     add2 = {+ 2}
     a = {add2 3}
     {print a}

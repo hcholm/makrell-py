@@ -1,5 +1,5 @@
 import ast as py
-from makrell.ast import (BinOp, Identifier, Sequence, Node)
+from makrell.ast import (BinOp, CurlyBrackets, Identifier, Sequence, Node)
 from makrell.baseformat import (ParseError, deparen)
 from makrell.makrellpy._compiler_common import stmt_wrap, transfer_pos
 from makrell.tokeniser import regular
@@ -69,7 +69,8 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
                 return pb.assign([c_left], c(right))
             
             case "|":
-                return pb.call(c(right), [c(left)])
+                rewrite = CurlyBrackets([right, left])
+                return c(rewrite)
             
             case "|*":
                 values = c(left)
@@ -77,7 +78,8 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
                 return pb.call('map', [f, values])
             
             case "\\":
-                return pb.call(c(left), [c(right)])
+                rewrite = CurlyBrackets([left, right])
+                return c(rewrite)
             
             case "*\\":
                 values = c(right)

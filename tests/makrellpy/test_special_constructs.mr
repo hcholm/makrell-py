@@ -31,6 +31,18 @@
     s = [2 3 5] | sum | {mul_xyz 2 _ 3}
     {print s}
     {assert s == 60}
+
+    b = true | not
+    {print b}
+    {assert b == false}
+
+    b = false | not
+    {print b}
+    {assert b == true}
+
+    b = true | not | not | not
+    {print b}
+    {assert b == false}
 }
 
 {test "Reverse pipe"
@@ -46,6 +58,10 @@
     s = f \ 7
     {print s}
     {assert s == 35}
+
+    s = f \ f \ 7
+    {print s}
+    {assert s == 175}
 
     s = x -> x * 11 \ 13
     {print s}
@@ -64,6 +80,18 @@
     s = {mul_xyz 2 _ 3} \ sum \ [2 3 5]
     {print s}
     {assert s == 60}
+
+    b = not \ true
+    {print b}
+    {assert b == false}
+
+    b = not \ false
+    {print b}
+    {assert b == true}
+
+    b = not \ not \ not \ true
+    {print b}
+    {assert b == false}
 }
 
 {test "Pipe map"

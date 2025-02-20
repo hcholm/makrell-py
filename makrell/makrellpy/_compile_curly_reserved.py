@@ -365,8 +365,8 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
             return q_py
         
         case "def":
-            print(reg_nodes)
-            print(nodes)
+            # print(reg_nodes)
+            # print(nodes)
             if len(reg_nodes) >= 3:
                 deftype = reg_nodes[1].value
                 match deftype:

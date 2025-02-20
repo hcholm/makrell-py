@@ -141,6 +141,20 @@
     {assert c == 480}
 }
 
+{test "Meta function scope"
+
+    {meta
+        a = 3
+        {fun f [ns]
+            {print "meta f"}
+            {print "a =" a}
+            {assert a == 3}
+            []
+        }
+    }
+    {f}
+}
+
 {test "Macro"
     {def macro pipe [ns]
         ns = {regular ns}

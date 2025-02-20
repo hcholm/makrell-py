@@ -1,4 +1,5 @@
 import ast as py
+import types
 from typing import Any, cast
 from makrell.ast import (
     BinOp, Identifier, Number, Sequence, CurlyBrackets, Node, SquareBrackets, String)
@@ -133,6 +134,11 @@ from makrell.baseformat import operator_parse, src_to_baseformat
         py.fix_missing_locations(body)
         c = compile(body, "", mode="exec")
         exec(c, self.globals, self.symbols)
+
+    def meta_runnable_func(self, f):
+        syms = self.globals.copy()
+        syms.update(self.symbols.copy())
+        return types.FunctionType(f.__code__, globals=syms)
 
     def quote(self, n: Node, raw: bool = False) -> Node:
         # TODO: cleanup raw usage

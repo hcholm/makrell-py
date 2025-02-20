@@ -139,6 +139,17 @@
     {assert x == 6}
 }
 
+{test "do nested in lambda"
+    f = x -> {do
+        {do
+            x * 2
+        }
+    }
+    y = {f 3}
+    {print y}
+    {assert y == 6}
+}
+
 {test "If"
     a = {if true 1 2}
     {assert a == 1}

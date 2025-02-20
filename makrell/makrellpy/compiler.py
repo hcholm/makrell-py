@@ -120,7 +120,7 @@ def exec_nodes(nodes: list[Node], filename: str | None = None) -> Any:
     m = nodes_to_module(nodes, cc, filename)
     if filename is None:
         filename = "<string>"
-    # print(py.unparse(m))
+    print(py.unparse(m))
     c = compile(m, filename, mode="exec")
     glob = {}
     init_py = \

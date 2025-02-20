@@ -41,8 +41,12 @@ def compile_binop(n: BinOp, cc: CompilerContext, compile_mr) -> py.AST | list[py
                     raise Exception(f"Invalid left side of ->: {left}")
                 
                 if isinstance(right, Sequence) and len(right.nodes) > 1 and get_identifier(right.nodes[0], "do"):
+                    cc.push_fun_defs_scope()
                     rnodes = regular(right.nodes)
-                    body = stmt_wrap([c(n) for n in cc.operator_parse(rnodes[1:])])
+                    # body = stmt_wrap([c(n) for n in cc.operator_parse(rnodes[1:])])
+                    stmts = stmt_wrap([c(n) for n in cc.operator_parse(rnodes[1:])])
+                    fun_defs = cc.pop_fun_defs_scope()
+                    body = fun_defs + stmts
                     f = pb.function_def(name, args, body)
                     cc.add_to_fun_defs_scope(f)
                     return pb.name_ld(name)

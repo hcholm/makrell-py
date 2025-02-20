@@ -61,6 +61,7 @@ class CompilerContext:
         self.meta = Meta(self)
         self.body_stack = []
         self.diag: Diagnostics = Diagnostics()
+        self.running_in_meta = False
 
     def gensym(self) -> str:
         self.gensym_counter += 1
@@ -126,7 +127,9 @@ from makrell.baseformat import operator_parse, src_to_baseformat
 
     def run(self, nodes: list[Node]) -> Any:
         self.node_blocks += nodes
+        self.cc.running_in_meta = True
         pyast = self.cc.compile_mr(Sequence(nodes), self.cc)
+        self.cc.running_in_meta = False
         if not isinstance(pyast, list):
             pyast = [pyast]
         pyast = self.cc.fun_defs[0] + pyast

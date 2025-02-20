@@ -65,9 +65,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                     meta_args = []
                 else:
                     meta_args = nodes[2:]
-                # result = cc.meta.symbols[n0.value](meta_args)
                 f = cc.meta.symbols[n0.value]
-                print("meta symbols: ", cc.meta.symbols)
                 mrf = cc.meta.meta_runnable_func(f)
                 result = mrf(meta_args)
                 
@@ -118,7 +116,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
             if r:
                 # reserved word
                 return r
-            if value in cc.meta.symbols:
+            if not cc.running_in_meta and value in cc.meta.symbols:
                 # meta identifier
                 return c(cc.meta.symbols[value])
             # regular identifier

@@ -142,7 +142,6 @@
 }
 
 {test "Meta function scope"
-
     {meta
         a = 3
         {fun f [ns]
@@ -153,6 +152,17 @@
         }
     }
     {f}
+}
+
+{test "Shared meta scope"
+    {meta
+        a = 3
+        {print "a =" a "(1)"}
+    }
+    {meta
+        {print "a =" a "(2)"}
+        {assert a == 3}
+    }
 }
 
 {test "Macro"

@@ -2,5 +2,6 @@
 requires=[
     "setuptools>=18",
     "wheel",
+    "regex",
 ]
 

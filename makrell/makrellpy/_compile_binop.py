@@ -1,13 +1,14 @@
 import ast as py
 from makrell.ast import (BinOp, CurlyBrackets, Identifier, Sequence, Node)
 from makrell.baseformat import (ParseError, deparen)
-from makrell.makrellpy._compiler_common import stmt_wrap, transfer_pos
+from makrell.makrellpy._compiler_common import CompilerContext, stmt_wrap, transfer_pos
 from makrell.tokeniser import regular
 from makrell.parsing import (get_binop, get_square_brackets, get_identifier)
 from .py_primitives import bin_ops, bool_ops, compare_ops
 import makrell.makrellpy.pyast_builder as pb
 
-def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
+
+def compile_binop(n: BinOp, cc: CompilerContext, compile_mr) -> py.AST | list[py.AST] | None:
     left = n.left
     right = n.right
     op = n.op
@@ -43,7 +44,7 @@ def compile_binop(n: BinOp, cc, compile_mr) -> py.AST | list[py.AST] | None:
                     rnodes = regular(right.nodes)
                     body = stmt_wrap([c(n) for n in cc.operator_parse(rnodes[1:])])
                     f = pb.function_def(name, args, body)
-                    cc.fun_defs.append(f)
+                    cc.add_to_fun_defs_scope(f)
                     return pb.name_ld(name)
                 else:
                     return pb.lambda_(args, c(right))

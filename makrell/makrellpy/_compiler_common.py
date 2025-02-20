@@ -55,7 +55,7 @@ class CompilerContext:
     def __init__(self, compile_mr):
         self.compile_mr = compile_mr
         self.gensym_counter = 0
-        self.fun_defs = []
+        self.fun_defs = [[]]  # a stack
         self.operators = {}
         self.meta = Meta(self)
         self.body_stack = []
@@ -83,7 +83,7 @@ class CompilerContext:
         pyast = self.compile_mr(Sequence(nodes), self)
         if not isinstance(pyast, list):
             pyast = [pyast]
-        pyast = self.fun_defs + pyast
+        pyast = self.fun_defs[0] + pyast
         body = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
         py.fix_missing_locations(body)
         c = compile(body, "", mode="exec")
@@ -97,6 +97,15 @@ class CompilerContext:
     
     def add_to_body_block(self, node: py.AST):
         self.body_stack[-1].append(node)
+
+    def push_fun_defs_scope(self):
+        self.fun_defs.append([])
+
+    def pop_fun_defs_scope(self) -> list[py.AST]:
+        return self.fun_defs.pop()
+    
+    def add_to_fun_defs_scope(self, node: py.AST):
+        self.fun_defs[-1].append(node)
 
 
 class Meta:
@@ -119,7 +128,7 @@ from makrell.baseformat import operator_parse, src_to_baseformat
         pyast = self.cc.compile_mr(Sequence(nodes), self.cc)
         if not isinstance(pyast, list):
             pyast = [pyast]
-        pyast = self.cc.fun_defs + pyast
+        pyast = self.cc.fun_defs[0] + pyast
         body = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
         py.fix_missing_locations(body)
         c = compile(body, "", mode="exec")

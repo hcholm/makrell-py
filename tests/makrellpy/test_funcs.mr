@@ -42,7 +42,7 @@
     {assert actual == 5}
 }
 
-{*test "Nested do blocks"
+{test "Nested do blocks"
     actual = {do
         x = 2
         y = 3
@@ -53,9 +53,9 @@
     }
     {print actual}
     {assert actual == 9}
-*}
+}
 
-{*test "Nested do blocks 2"
+{test "Nested do blocks 2"
     actual = {do
         x = 2
         y = 3
@@ -67,8 +67,8 @@
             }
         }
     }
-    {assert actual == 314}
-*}
+    {assert actual == 14}
+}
 
 
 {test "Function calls"

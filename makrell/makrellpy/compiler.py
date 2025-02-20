@@ -22,7 +22,7 @@ def import_mr_module(name: str, dest_module, alias: str | None = None) -> py.Mod
     cc = CompilerContext(compile_mr)
     run_core_mr(cc)
     pyast = cc.operator_parse(regular(src_to_baseformat(f"import {name}")))
-    pyast = cc.fun_defs + pyast
+    pyast = cc.fun_defs[0] + pyast
     m = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
     py.fix_missing_locations(m)
     return m
@@ -65,7 +65,7 @@ def nodes_to_module(nodes: list[Node], cc: CompilerContext | None = None,
         raise Exception(msg)
     if not isinstance(pyast, list):
         pyast = [pyast]
-    pyast = cc.fun_defs + pyast
+    pyast = cc.fun_defs[0] + pyast
 
     ass = get_mr_meta_assignment(cc)
     if ass is not None:
@@ -89,7 +89,7 @@ def eval_nodes(ns: list[Node], cc: CompilerContext | None = None,
     pyast = [compile_mr(n, cc) for n in ns]
     if not isinstance(pyast, list):
         pyast = [pyast]
-    pyast = cc.fun_defs + pyast
+    pyast = cc.fun_defs[0] + pyast
 
     last_is_expr = isinstance(pyast[-1], py.expr)
     stmt_count = len(pyast) - (1 if last_is_expr else 0)

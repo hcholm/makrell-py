@@ -342,12 +342,17 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
                 raise Exception(f"Invalid number of arguments to slice: {parlen}")
 
         case "do":
+            cc.push_fun_defs_scope()
             id = cc.gensym()
-            body = stmt_wrap([c(n) for n in flatten(nodes[1:])])
+            stmts = stmt_wrap([c(n) for n in flatten(nodes[1:])])
+            fun_defs = cc.pop_fun_defs_scope()
+            body = fun_defs + stmts
+            # body = stmt_wrap([c(n) for n in flatten(nodes[1:])])
+            # body = cc.fun_defs.pop() + body
             args = py.arguments(args=[], posonlyargs=[], kwonlyargs=[],
                                 kw_defaults=[], defaults=[])
             f = py.FunctionDef(id, args, body, [])
-            cc.fun_defs.append(f)
+            cc.add_to_fun_defs_scope(f)
             return py.Call(py.Name(id, py.Load()), [], [])
 
         case "meta":

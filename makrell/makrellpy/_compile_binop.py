@@ -35,10 +35,10 @@ def compile_binop(n: BinOp, cc: CompilerContext, compile_mr) -> py.AST | list[py
                 name = cc.gensym()
                 if aid := get_identifier(left):
                     args = aid.value
-                elif asb := get_square_brackets(left):
+                elif (asb := get_square_brackets(left)) != None:
                     args = [n.value for n in regular(asb.nodes)]
                 else:
-                    raise Exception(f"Invalid left side of ->: {left}")
+                    raise Exception(f"Invalid left side of ->: {left} {type(left)}")
                 
                 if isinstance(right, Sequence) and len(right.nodes) > 1 and get_identifier(right.nodes[0], "do"):
                     cc.push_fun_defs_scope()

@@ -60,6 +60,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                 return r
             
             # meta symbol call
+            # BUG: does not handle a.f calls
             if n0.value in cc.meta.symbols:
                 if len(nodes) <= 2:  # whitespace after identifier
                     meta_args = []

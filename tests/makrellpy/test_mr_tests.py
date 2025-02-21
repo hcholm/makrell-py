@@ -13,6 +13,7 @@ mr_files = [
     'test_classes.mr',
     'test_flow.mr',
     'test_estrings.mr',
+    'test_coroutines.mr'
 ]
 
 
@@ -21,6 +22,7 @@ here_dir = os.path.dirname(os.path.abspath(__file__))
 
 def get_test_blocks(filename):
     tests_path = os.path.join(here_dir, filename)
+    print(f"Processing file: {tests_path}")
     setup = None
     blocks = []
     with open(tests_path, encoding='utf-8') as f:

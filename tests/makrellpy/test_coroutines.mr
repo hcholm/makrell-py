@@ -1,0 +1,14 @@
+{test "Basic Async Await"
+    {import asyncio}
+    
+    {async fun delay_value [value seconds]
+        {await {asyncio.sleep seconds}}
+        value
+    }
+
+    {async fun test_delay_value []
+        {assert {await {delay_value 42 2}} == 42 "42 == 42"}
+    }
+
+    {asyncio.run {test_delay_value}}        
+}

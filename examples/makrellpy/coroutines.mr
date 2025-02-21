@@ -1,0 +1,14 @@
+{import asyncio}
+
+{async fun just_sleep [n]
+    {print "Sleeping now for " n " seconds"}
+    {await {asyncio.sleep n}}
+    n
+}
+
+{async fun main []
+    n = {await {just_sleep 5}}
+    {print "Slept for " n " seconds"}
+}
+
+{asyncio.run {main}}

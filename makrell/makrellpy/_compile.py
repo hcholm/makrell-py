@@ -276,6 +276,53 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                     cc.diag.error(0, f"Invalid number of arguments to while: {parlen}", n0)
                     return None
                 
+            case "async":
+                if parlen < 2:
+                    cc.diag.error(0, f"Invalid number of arguments to async: {parlen}", n0)
+                    return None
+                if get_identifier(nodes[1], "fun"):
+                    if parlen < 3:
+                        cc.diag.error(0, f"Invalid async function definition: {parlen}", n0)
+                        return None
+                    name = nodes[2].value
+                    args_node = get_square_brackets(nodes[3]) or RoundBrackets([])
+                    args = py.arguments(
+                        args=[py.arg(n.value) for n in regular(args_node.nodes)],
+                        posonlyargs=[], kwonlyargs=[], kw_defaults=[], defaults=[]
+                    )
+                    body = stmt_wrap([c(n) for n in regular(nodes[4:])])
+                    return py.AsyncFunctionDef(
+                        name=name, args=args, body=body, decorator_list=[]
+                    )
+                elif get_identifier(nodes[1], "for"):
+                    if parlen < 3:
+                        cc.diag.error(0, f"Invalid async for: {parlen}", n0)
+                        return None
+                    target = c(nodes[2])
+                    target.ctx = py.Store()
+                    itr = c(nodes[3])
+                    body = stmt_wrap([c(n) for n in regular(nodes[4:])], auto_return=False)
+                    return py.AsyncFor(target, itr, body, [])
+                elif get_identifier(nodes[1], "with"):
+                    if parlen < 3:
+                        cc.diag.error(0, f"Invalid async with: {parlen}", n0)
+                        return None
+                    item_expr = c(nodes[2])
+                    item_var_name = get_identifier(nodes[3]).value if parlen >= 3 else cc.gensym()
+                    item_var = py.Name(item_var_name, py.Store())
+                    body = stmt_wrap([c(n) for n in regular(nodes[4:])], auto_return=False)
+                    return py.AsyncWith([py.withitem(item_expr, item_var)], body)
+                else:
+                    cc.diag.error(0, f"Unknown async construct: {nodes[1]}", nodes[1])
+                    return None
+
+            case "await":
+                if parlen == 1:
+                    return py.Await(c(nodes[1]))
+                else:
+                    cc.diag.error(0, f"Invalid number of arguments to await: {parlen}", n0)
+                    return None
+                
             case "fun":
                 if parlen >= 2:
                     name = nodes[1].value

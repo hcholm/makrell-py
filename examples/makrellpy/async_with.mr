@@ -1,0 +1,14 @@
+{import asyncio}
+
+{async fun delayed_task []
+    {await {asyncio.sleep 2}}
+    {print "Task done"}
+}
+
+{async fun main []
+    {async with {asyncio.timeout 4} _
+        {await {delayed_task}}
+    }
+}
+
+{asyncio.run {main}}

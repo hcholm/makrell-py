@@ -11,8 +11,8 @@ setup(
     url='https://github.com/hcholm/makrell-py',
     packages=find_packages(exclude=["tests*"]),
     package_data={
-        "makrell": ["*.mr"],
-        "makrell.makrellpy": ["*.mr"],
+        "makrell": ["*.mr", "*.mrpy"],
+        "makrell.makrellpy": ["*.mr", "*.mrpy"],
     },
     entry_points={
         'console_scripts': [

@@ -1,6 +1,6 @@
 import ast as py
 from importlib import import_module
-from makrell.ast import (Identifier, Sequence, CurlyBrackets, Node)
+from makrell.ast import (Identifier, RoundBrackets, Sequence, CurlyBrackets, Node)
 from makrell.baseformat import (Associativity, operator_parse)
 from makrell.makrellpy._compiler_common import CompilerContext
 from makrell.tokeniser import regular
@@ -294,18 +294,52 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
                 raise Exception(f"Invalid number of arguments to nonlocal: {parlen}")
             
         case "async":
-            if parlen == 1:
-                return py.AsyncFunctionDef(nodes[1].value, py.arguments([], None, None, []),
-                                           [c(nodes[2])], [])
+            if parlen < 2:
+                cc.diag.error(0, f"Invalid number of arguments to async: {parlen}", n0)
+                return None
+            if get_identifier(nodes[1], "fun"):
+                if parlen < 3:
+                    cc.diag.error(0, f"Invalid async function definition: {parlen}", n0)
+                    return None
+                name = nodes[2].value
+                args_node = get_square_brackets(nodes[3]) or RoundBrackets([])
+                args = py.arguments(
+                    args=[py.arg(n.value) for n in regular(args_node.nodes)],
+                    posonlyargs=[], kwonlyargs=[], kw_defaults=[], defaults=[]
+                )
+                body = stmt_wrap([c(n) for n in regular(nodes[4:])])
+                return py.AsyncFunctionDef(
+                    name=name, args=args, body=body, decorator_list=[]
+                )
+            elif get_identifier(nodes[1], "for"):
+                if parlen < 3:
+                    cc.diag.error(0, f"Invalid async for: {parlen}", n0)
+                    return None
+                target = c(nodes[2])
+                target.ctx = py.Store()
+                itr = c(nodes[3])
+                body = stmt_wrap([c(n) for n in regular(nodes[4:])], auto_return=False)
+                return py.AsyncFor(target, itr, body, [])
+            elif get_identifier(nodes[1], "with"):
+                if parlen < 3:
+                    cc.diag.error(0, f"Invalid async with: {parlen}", n0)
+                    return None
+                item_expr = c(nodes[2])
+                item_var_name = get_identifier(nodes[3]).value if parlen >= 3 else cc.gensym()
+                item_var = py.Name(item_var_name, py.Store())
+                body = stmt_wrap([c(n) for n in regular(nodes[4:])], auto_return=False)
+                return py.AsyncWith([py.withitem(item_expr, item_var)], body)
             else:
-                raise Exception(f"Invalid number of arguments to async: {parlen}")
-            
+                cc.diag.error(0, f"Unknown async construct: {nodes[1]}", nodes[1])
+                return None
+
         case "await":
             if parlen == 1:
                 return py.Await(c(nodes[1]))
             else:
-                raise Exception(f"Invalid number of arguments to await: {parlen}")
-            
+                cc.diag.error(0, f"Invalid number of arguments to await: {parlen}", n0)
+                return None
+                        
         case "dict":
             if parlen == 0:
                 return py.Dict([], [])

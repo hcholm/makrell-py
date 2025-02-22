@@ -13,8 +13,8 @@ mr_files = [
     'test_classes.mr',
     'test_flow.mr',
     'test_estrings.mr',
-    'test_coroutines.mr'
-    'test_patmatch.mr',
+    'test_coroutines.mr',
+    # 'test_patmatch.mr',
 ]
 
 

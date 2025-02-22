@@ -21,8 +21,7 @@
         }
 
         {fun make_test_main [testval pattern]
-            handler = {get_handler pattern}
-            make_test = handler
+            make_test = {get_handler pattern}
             {make_test testval pattern make_test_main}
         }
 
@@ -64,7 +63,6 @@
             }
         }
         n
-        # {quote -17}
     }
 }
 

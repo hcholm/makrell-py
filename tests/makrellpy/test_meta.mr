@@ -141,8 +141,63 @@
     {assert c == 480}
 }
 
+{test "Meta function scope"
+    {meta
+        {global a}
+        a = 3
+        {fun f [ns]
+            {print "meta f"}
+            {print "a =" a}
+            {assert a == 3}
+            []
+        }
+    }
+    {f}
+}
+
+{test "Shared meta scope"
+    {meta
+        a = 3
+        {print "a =" a "(1)" a|type}
+    }
+    {meta
+        {print "a =" a "(2)" a|type}
+        {assert a == 3}
+    }
+}
+
+{test "Shared meta scope 2"
+    {meta
+        a = "asd"
+        {print "a =" a "(1)" a|type}
+    }
+    {meta
+        {print "a =" a "(2)" a|type}
+        {assert a == "asd"}
+        {assert {len a} == 3}
+        {assert (a|len) == 3}
+    }
+}
+
+{test "Shared meta scope 2"
+    {meta
+        a = [2 3]
+        {a.append 5}
+        {print "a =" a "(1)" a|type}
+    }
+    {meta
+        {print "a =" a "(2)" a|type}
+        {assert {len a} == 3}
+        # BUG: {a.append 7} fails
+        tmp = a
+        {tmp.append 7}
+        {assert {len a} == 4}
+        {assert a == [2 3 5 7]}
+    }
+}
+
 {test "Macro"
-    {macro pipe [ns]
+    {def macro pipe [ns]
         ns = {regular ns}
         p = ns@0
         i = 1
@@ -163,7 +218,7 @@
 }
 
 {test "RPN macro"
-    {macro rpn [nodes]
+    {def macro rpn [nodes]
         nodes = {regular nodes}
         {fun transform [ns]
             stack = []
@@ -209,7 +264,7 @@
 }
 
 {test "Lisp macro"
-    {macro lisp [nodes]
+    {def macro lisp [nodes]
         nodes = {regular nodes}
         {fun transform [n]
 

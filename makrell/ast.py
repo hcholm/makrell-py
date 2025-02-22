@@ -90,6 +90,9 @@ class Identifier(Node):
     
     def __repr__(self) -> str:
         return f"ID:{self.value}"
+    
+    def to_code(self, indent: int):
+        return self.value
 
 
 @dataclass()
@@ -102,6 +105,9 @@ class String(Node):
     
     def __repr__(self) -> str:
         return f"S:{self.value}"
+    
+    def to_code(self, indent: int):
+        return self.value + (self.suffix or "")
 
 
 @dataclass
@@ -114,6 +120,9 @@ class Number(Node):
     
     def __repr__(self) -> str:
         return f"N:{self.value}"
+    
+    def to_code(self, indent: int):
+        return self.value + (self.suffix or "")
 
 
 @dataclass
@@ -125,6 +134,9 @@ class Operator(Node):
     
     def __repr__(self) -> str:
         return f"OP:{self.value}"
+    
+    def to_code(self, indent: int):
+        return self.value
 
 @dataclass
 class BinOp(Node):

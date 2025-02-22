@@ -137,6 +137,8 @@ default_operator_precedences = {
     '>': (50, Associativity.LEFT),
     '<=': (50, Associativity.LEFT),
     '>=': (50, Associativity.LEFT),
+    '~=': (50, Associativity.LEFT),
+    '!~=': (50, Associativity.LEFT),
 
     '..': (90, Associativity.LEFT),
         

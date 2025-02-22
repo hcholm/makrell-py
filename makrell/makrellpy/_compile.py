@@ -1,169 +1,21 @@
 import ast as py
-from importlib import import_module
-from typing import Any
 from makrell.ast import (
     BinOp, Identifier, Number, Sequence, CurlyBrackets, Node, RoundBrackets,
     SquareBrackets, String)
-from makrell.baseformat import (
-    Associativity, ParseError, default_precedence_lookup, deparen, operator_parse, src_to_baseformat)
+from makrell.makrellpy._compile_curly_reserved import compile_curly_reserved
+from makrell.makrellpy._compiler_common import CompilerContext
 from makrell.tokeniser import regular
-from makrell.parsing import (
-    Diagnostics, get_binop, get_curly, get_operator, get_square_brackets, python_value, flatten, get_identifier)
-from .py_primitives import bin_ops, bool_ops, compare_ops, simple_reserved
-
-
-def ensure_stmt(pa: py.AST) -> py.AST:
-    if isinstance(pa, py.stmt):
-        return pa
-    e = py.Expr(pa)
-    if "lineno" not in pa.__dict__:  # macro nodes don't have position info, TODO: fix
-        return e
-    e.lineno = pa.lineno
-    e.col_offset = pa.col_offset
-    e.end_lineno = pa.end_lineno
-    e.end_col_offset = pa.end_col_offset
-    return e
-
-
-def stmt_wrap(ns: list[py.AST], auto_return: bool = True) -> list[py.AST]:
-    if ns == []:
-        return [py.Return(py.Constant(None))]
-    return [
-        py.Return(n) if auto_return and i == len(ns) - 1 and isinstance(n, py.expr) else
-        ensure_stmt(n)
-        for i, n in enumerate(ns)
-    ]
-
-
-def dotted_ident(n: Node) -> str:
-    if get_identifier(n):
-        return n.value
-    elif isinstance(n, BinOp) and n.op == ".":
-        return dotted_ident(n.left) + "." + dotted_ident(n.right)
-    else:
-        raise Exception(f"Invalid identifier: {n}")
-
-
-class CompilerContext:
-    def __init__(self):
-        self.gensym_counter = 0
-        self.fun_defs = []
-        self.operators = {}
-        self.meta = Meta(self)
-        self.body_stack = []
-        self.diag: Diagnostics = Diagnostics()
-
-    def gensym(self) -> str:
-        self.gensym_counter += 1
-        return f"__gensym_{self.gensym_counter}__"
-
-    def op_precedence(self, op: str) -> tuple[int, Associativity]:
-        if op in self.operators:
-            return self.operators[op]
-        return default_precedence_lookup(op)
-
-    def operator_parse(self, nodes: list[Node]) -> list[Node]:
-        return operator_parse(regular(nodes), self.op_precedence)
-
-    def import_with_mr_meta(self, src_module, names, dest_module):
-        src_meta = src_module.__dict__.get("_mr_meta_", None)
-        for src in src_meta:
-            bf = src_to_baseformat(src)
-            self.meta.run(bf)
-
-    def run(self, nodes: list[Node]) -> Any:
-        pyast = compile_mr(Sequence(nodes), self)
-        if not isinstance(pyast, list):
-            pyast = [pyast]
-        pyast = self.fun_defs + pyast
-        body = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
-        py.fix_missing_locations(body)
-        c = compile(body, "", mode="exec")
-        exec(c, {}, {})
-    
-    def push_body_block(self, body: list[py.AST]):
-        self.body_stack.append(body)
-
-    def pop_body_block(self) -> list[py.AST]:
-        return self.body_stack.pop()
-    
-    def add_to_body_block(self, node: py.AST):
-        self.body_stack[-1].append(node)
-
-
-class Meta:
-    def __init__(self, cc: CompilerContext):
-        self.globals = {'$context': cc}
-        self.symbols = {}
-        self.node_blocks = []
-        self.cc: CompilerContext = cc
-        self._instance = None
-
-        src_init = """
-from makrell.ast import *
-from makrell.tokeniser import regular
-from makrell.baseformat import operator_parse, src_to_baseformat
-"""
-        exec(src_init, self.globals)
-
-    def run(self, nodes: list[Node]) -> Any:
-        self.node_blocks += nodes
-        pyast = compile_mr(Sequence(nodes), self.cc)
-        if not isinstance(pyast, list):
-            pyast = [pyast]
-        pyast = self.cc.fun_defs + pyast
-        body = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
-        py.fix_missing_locations(body)
-        c = compile(body, "", mode="exec")
-        exec(c, self.globals, self.symbols)
-
-    def quote(self, n: Node, raw: bool = False) -> Node:
-        # TODO: cleanup raw usage
-        match n:
-            case CurlyBrackets(nodes) if (get_identifier(nodes[0], "unquote")
-                                          or get_identifier(nodes[0], "$")):
-                unquoted = self.cc.operator_parse(regular(nodes[1:]))
-                return unquoted[0]
-            case False:
-                return Identifier("false")
-            case True:
-                return Identifier("true")
-            case None:
-                return Identifier("null")
-            case Node():
-                name = n.__class__.__name__
-                args = [self.quote(v) for (k, v) in n.__dict__.items()
-                        if not k.startswith("_")]
-                ident = Identifier(name)
-                cb = CurlyBrackets([ident, *args])
-                cb._original_nodes = args
-                return cb
-            case list(ns):
-                if not raw:
-                    ns = regular(ns)
-                return SquareBrackets([self.quote(n) for n in ns])
-            case s if isinstance(n, str):
-                return String('"' + s + '"')
-            case n if isinstance(n, int):
-                return Number(str(n))
-        self.cc.diag.error(f"Invalid node to quote: {n}")
-
-
-def transfer_pos(n: Node, pa: py.AST) -> py.AST:
-    try:
-        pa.lineno = n._start_line
-        pa.col_offset = n._start_column
-        pa.end_lineno = n._end_line
-        pa.end_col_offset = n._end_column
-    except AttributeError:
-        pass
-    return pa
+from makrell.parsing import (get_binop, get_operator, python_value, get_identifier)
+from .py_primitives import simple_reserved
+from ._compile_binop import compile_binop
+from ._compiler_common import transfer_pos
+import makrell.makrellpy.pyast_builder as pb
 
 
 def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
 
     # recurse through this
-    def c(n: Node) -> py.AST | list[py.AST] | None:
+    def c(n: Node) -> py.expr:  # py.AST | list[py.AST] | None:
         pa = compile_mr(n, cc)
         if pa is not None:
             if isinstance(pa, list):
@@ -637,65 +489,48 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
 
         # operator as function call
         if get_operator(reg_nodes[0]):
-            # TODO: more arguments
+            op = reg_nodes[0].value
             if len(reg_nodes) == 1:
-                argname1 = "$left"
-                argname2 = "$right"
-                args = [py.arg(argname1), py.arg(argname2)]
-                body = c(BinOp(Identifier(argname1), reg_nodes[0].value, Identifier(argname2)))
+                # {+}
+                args = ['$left', '$right']
+                body = c(BinOp(Identifier(args[0]), op, Identifier(args[1])))
             elif len(reg_nodes) == 2:
-                argname1 = "$left"
-                args = [py.arg(argname1)]
-                body = c(BinOp(reg_nodes[1], reg_nodes[0].value, Identifier(argname1)))
+                # {+ 2}
+                args = '$left'
+                body = c(BinOp(reg_nodes[1], op, Identifier(args)))
             else:
                 raise Exception(f"Invalid number of arguments to operator: {len(reg_nodes)}")
-            arguments = py.arguments(args=args, posonlyargs=[], kwonlyargs=[],
-                                     kw_defaults=[], defaults=[])
-            r = py.Lambda(arguments, body)
+            r = pb.lambda_(args, body)
             return r
-
-        # operator definition
-        if get_identifier(n0, "operator"):
-            if len(reg_nodes) < 3:
-                raise Exception(f"Invalid number of arguments to operator: {parlen}")
-            is_rass = get_identifier(reg_nodes[3], "rightassoc")
-            op = reg_nodes[1].value
-            precedence = int(reg_nodes[2].value)
-            associativity = Associativity.RIGHT if is_rass else Associativity.LEFT
-            cc.operators[op] = (precedence, associativity)
-
-            expr_start = 4 if is_rass else 3
-            expr_nodes = reg_nodes[expr_start:]
-            body = c(operator_parse(expr_nodes, cc.op_precedence)[0])
-            arguments = py.arguments(args=[py.arg("$left"), py.arg("$right")], posonlyargs=[],
-                                     kwonlyargs=[], kw_defaults=[], defaults=[])
-            expr = py.Lambda(arguments, body)
-            cc.meta.symbols[op] = expr
-            return py.Pass()
 
         opp_nodes = cc.operator_parse(reg_nodes)
         opp_n0 = opp_nodes[0]
 
         if get_identifier(n0):
             # reserved word
-            r = mr_curly_reserved(n, opp_nodes)
+            r = compile_curly_reserved(n, cc, compile_mr, opp_nodes)
             if r:
                 return r
             
             # meta symbol call
+            # BUG: does not handle a.f calls
             if n0.value in cc.meta.symbols:
                 if len(nodes) <= 2:  # whitespace after identifier
                     meta_args = []
                 else:
                     meta_args = nodes[2:]
-                result = cc.meta.symbols[n0.value](meta_args)
+                f = cc.meta.symbols[n0.value]
+                mrf = f
+                # mrf = cc.meta.meta_runnable_func(f)
+                result = mrf(meta_args)
+                
                 if isinstance(result, Node):
                     return c(result)
                 return [c(n) for n in regular(result)]
 
             if get_identifier(opp_n0):
                 # function call, identifier
-                f = py.Name(opp_n0.value, py.Load())
+                f = pb.name_ld(opp_n0.value)
                 transfer_pos(opp_n0, f)
             else:
                 # ?
@@ -736,47 +571,31 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
             if r:
                 # reserved word
                 return r
-            if value in cc.meta.symbols:
+            if not cc.running_in_meta and value in cc.meta.symbols:
                 # meta identifier
                 return c(cc.meta.symbols[value])
             # regular identifier
-            return py.Name(value, py.Load())
+            return pb.name_ld(value)
             
         case String():
             # string constant, bin/oct/hex number, regex, datetime
             n._type = Identifier("str")
-            return py.Constant(python_value(n))
+            return pb.constant(python_value(n))
         
         case Number():
             # numeric constant
             value = python_value(n)
             n._type = Identifier("int" if isinstance(value, int) else "float")
-            return py.Constant(python_value(n))
+            return pb.constant(python_value(n))
                        
         case BinOp(left, op, right):
-            # python operator
-            if op in bin_ops:
-                return py.BinOp(c(left), bin_ops[op], c(right))
-            elif op in bool_ops:
-                n._type = Identifier("bool")
-                return py.BoolOp(bool_ops[op], [c(left), c(right)])
-            elif op in compare_ops:
-                return py.Compare(c(left), [compare_ops[op]], [c(right)])
-            elif op in cc.operators:
-                # makrell operator
-                return mr_binop(left, op, right)
-            else:
-                # ?
-                r = mr_binop(left, op, right)
-                if r:
-                    return r
-                raise ParseError(f"Unknown operator: {op}")
+            return compile_binop(n, cc, compile_mr)
         
         case RoundBrackets(nodes):
             nodes = cc.operator_parse(regular(nodes))
             if len(nodes) == 0:
                 # () is null
-                return py.Constant(None)
+                return pb.constant(None)
             if len(nodes) == 1:
                 # (x) is x
                 return c(nodes[0])
@@ -794,7 +613,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
         
         case Sequence(nodes):
             if len(nodes) == 0:
-                return py.Constant(None)
+                return pb.constant(None)
             if len(nodes) == 1:
                 return c(nodes[0])
             else:

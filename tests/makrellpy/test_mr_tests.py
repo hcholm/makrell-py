@@ -14,6 +14,7 @@ mr_files = [
     'test_flow.mr',
     'test_estrings.mr',
     'test_coroutines.mr'
+    'test_patmatch.mr',
 ]
 
 

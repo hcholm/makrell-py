@@ -10,9 +10,9 @@
 }
 
 {test "custom operators"
-    {operator 😐 100
+    {def operator 😐 100
         $left + $right + 1}
-    {operator 😵 90
+    {def operator 😵 90
         $left - $right}
     {do
         a = 2 😵 3 😐 5
@@ -25,35 +25,82 @@
 }
 
 
-{test "cond macro"
-    a = {cond
+{test "if"
+    a = {if
         true 2
         false 3}
     a | print
     {assert a == 2}
 
-    b = {cond
+    b = {if
         false 2
         true 3}
     b | print
     {assert b == 3}
 
-    c = {cond
+    c = {if
         a < b  a
                b}
     c | print
     {assert c == 2}
 
-    d = {cond
+    d = {if
         a > b  a
                b}
     d | print
     {assert d == 3}
+    
+    d = {if
+        a > b  a}
+    d | print
+    {assert d == null}
 
-    e = {cond
+    d = {if true}
+    d | print
+    {assert d == null}
+
+    d = {if false}
+    d | print
+    {assert d == null}
+
+    e = {if
         {do {global a} {global b} a=a*2 b=b*2 a > b}  a
         a < b  b
                0}
     e | print
-    {assert e == 6}  # ?
+    {assert e == 6}
 }
+
+
+{fun content_div [title content]
+    {$$
+        {div [class="content"]
+            {h2 [class="title"] {$ title}}
+            {p [class="text"] {$ content}}
+        }
+    }
+}
+
+
+title    "This is a test"
+subtitle "of some content format"
+content  {div
+    {p This is a test of some body text.}
+    {ul
+        {li This is a list item.}
+        {li This is another list item.}
+    }
+}
+
+
+title    "This is a test"
+subtitle "of some content format"
+content  {div
+
+    p> This is a test of some body text.
+    {ul
+        li> This is a list item.
+        li> This is another list item.
+    }
+}
+

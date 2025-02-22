@@ -1,0 +1,5 @@
+
+
+{def operator >> 100
+    [x] -> (x | $left | $right)
+}

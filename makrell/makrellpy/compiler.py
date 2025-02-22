@@ -8,8 +8,8 @@ from makrell.baseformat import (
     src_to_baseformat, include_includes)
 from makrell.tokeniser import regular
 from makrell.parsing import (Diagnostics, flatten)
-
-from ._compile import (CompilerContext, compile_mr, stmt_wrap)
+from ._compiler_common import stmt_wrap
+from ._compile import (CompilerContext, compile_mr)
 
 
 def import_mr_module(name: str, dest_module, alias: str | None = None) -> py.Module:
@@ -19,18 +19,20 @@ def import_mr_module(name: str, dest_module, alias: str | None = None) -> py.Mod
     else:
         setattr(dest_module, name, m)
     
-    cc = CompilerContext()
+    cc = CompilerContext(compile_mr)
     run_core_mr(cc)
     pyast = cc.operator_parse(regular(src_to_baseformat(f"import {name}")))
-    pyast = cc.fun_defs + pyast
+    pyast = cc.fun_defs[0] + pyast
     m = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
     py.fix_missing_locations(m)
     return m
 
 
 def run_core_mr(cc: CompilerContext):
-    core_mr = get_src("core.mr")
+    core_mr = get_src("core.mrpy")
     cc.run(cc.operator_parse(regular(src_to_baseformat(core_mr))))
+    patmatch_mr = get_src("patmatch.mrpy")
+    cc.run(cc.operator_parse(regular(src_to_baseformat(patmatch_mr))))
 
 
 def get_mr_meta_assignment(cc: CompilerContext) -> py.Assign | None:
@@ -38,7 +40,7 @@ def get_mr_meta_assignment(cc: CompilerContext) -> py.Assign | None:
     if len(syms) == 0:
         return None
     
-    def sym_to_pa(sym: Node) -> py.AST:
+    def sym_to_pa(sym: Node) -> py.expr:
         return py.Constant(str(sym))
     py_syms = [sym_to_pa(sym) for sym in syms]
     arr = py.List(py_syms, ctx=py.Load())
@@ -55,7 +57,7 @@ def nodes_to_module(nodes: list[Node], cc: CompilerContext | None = None,
                     filename: str | None = None,
                     run_core: bool = True) -> py.Module:
     nodes = flatten(nodes)
-    cc = cc or CompilerContext()
+    cc = cc or CompilerContext(compile_mr)
     if run_core:
         run_core_mr(cc)
         cc.meta.node_blocks.clear()
@@ -65,7 +67,7 @@ def nodes_to_module(nodes: list[Node], cc: CompilerContext | None = None,
         raise Exception(msg)
     if not isinstance(pyast, list):
         pyast = [pyast]
-    pyast = cc.fun_defs + pyast
+    pyast = cc.fun_defs[0] + pyast
 
     ass = get_mr_meta_assignment(cc)
     if ass is not None:
@@ -84,12 +86,12 @@ def eval_nodes(ns: list[Node], cc: CompilerContext | None = None,
         ns = [ns]
     if len(ns) == 0:
         return None
-    cc = cc or CompilerContext()
+    cc = cc or CompilerContext(compile_mr)
     run_core_mr(cc)
     pyast = [compile_mr(n, cc) for n in ns]
     if not isinstance(pyast, list):
         pyast = [pyast]
-    pyast = cc.fun_defs + pyast
+    pyast = cc.fun_defs[0] + pyast
 
     last_is_expr = isinstance(pyast[-1], py.expr)
     stmt_count = len(pyast) - (1 if last_is_expr else 0)
@@ -116,14 +118,16 @@ def eval_nodes(ns: list[Node], cc: CompilerContext | None = None,
 
 
 def exec_nodes(nodes: list[Node], filename: str | None = None) -> Any:
-    cc = CompilerContext()
+    cc = CompilerContext(compile_mr)
     m = nodes_to_module(nodes, cc, filename)
     if filename is None:
         filename = "<string>"
+    # TODO: cmd line option to print the generated code
+    # print(py.unparse(m))
     c = compile(m, filename, mode="exec")
     glob = {}
     init_py = \
-"""import sys
+        """import sys
 sys.path.append('.')
 """
     exec(init_py, glob)

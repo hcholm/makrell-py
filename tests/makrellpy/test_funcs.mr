@@ -42,7 +42,7 @@
     {assert actual == 5}
 }
 
-{*test "Nested do blocks"
+{test "Nested do blocks"
     actual = {do
         x = 2
         y = 3
@@ -53,9 +53,9 @@
     }
     {print actual}
     {assert actual == 9}
-*}
+}
 
-{*test "Nested do blocks 2"
+{test "Nested do blocks 2"
     actual = {do
         x = 2
         y = 3
@@ -67,8 +67,8 @@
             }
         }
     }
-    {assert actual == 314}
-*}
+    {assert actual == 14}
+}
 
 
 {test "Function calls"
@@ -130,6 +130,9 @@
 
     h = x -> x * x
     {assert {h 3} == 9}
+
+    i = [] -> 3
+    {assert {i} == 3}
 }
 
 {test "Lambda immediate call"
@@ -137,6 +140,47 @@
             3}
     {print x}
     {assert x == 6}
+}
+
+{test "do nested in lambda"
+    f = x -> {do
+        {do
+            x * 2
+        }
+    }
+    y = {f 3}
+    {print y}
+    {assert y == 6}
+}
+
+{test "Function nested in function"
+    g = 5
+    {fun make_factoriser [factor]
+        {fun g [x]
+            x * factor
+        }
+        g
+    }
+    h = {make_factoriser 2}
+    y = {h 3}
+    {print g}
+    {assert g == 5}
+    {print y}
+    {assert y == 6}
+}
+
+{test "Lambda nested in function"
+    g = 5
+    {fun make_factoriser [factor]
+        g = x -> x * factor
+        g
+    }
+    h = {make_factoriser 2}
+    y = {h 3}
+    {print g}
+    {assert g == 5}
+    {print y}
+    {assert y == 6}
 }
 
 {test "If"

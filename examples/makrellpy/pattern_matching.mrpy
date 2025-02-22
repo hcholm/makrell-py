@@ -1,0 +1,52 @@
+
+{class Point []
+    {fun __init__ [self x y]
+        self.x = x
+        self.y = y
+    }
+    {fun __str__ [self]
+        {return "Point(" + {str self.x} + ", " + {str self.y} + ")"}
+    }
+}
+
+m = x -> {do
+    {match x
+        2
+            "two"
+        []
+            "an empty list"
+        [_ _ _]
+            "a list with three elements"
+        3
+            "three"
+        1 | 4 | 6
+            "one or four or six"
+        "asd"
+            "the string asd"
+        _:str
+            "some other string"
+#         # _%Point & _.x == 7
+#         #     "A Point object"
+        _:Point
+            "a Point object"
+        [2|5 _]
+            "a list with two elements, first is 2 or 5"
+        _   
+            "something else"
+        5   
+            "five"
+    }
+}
+
+testvals = [
+    0 1 2 3 4 5
+    "asd" "qwe"
+    {Point 2 3} {Point 7 5} {Point 11 13}
+    [] [2 3] [3 5] [5 7] [2 3 5]
+]
+
+{for i testvals
+    mr = {m i}
+    {print i ":" mr}
+}
+

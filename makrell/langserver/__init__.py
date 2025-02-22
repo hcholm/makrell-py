@@ -180,14 +180,12 @@ def did_change(ls, params: lsp.DidChangeTextDocumentParams):
 
 @mr_server.feature(lsp.TEXT_DOCUMENT_DID_CLOSE)
 def did_close(server: MakrellLanguageServer, params: lsp.DidCloseTextDocumentParams):
-    """Text document did close notification."""
-    server.show_message("Text Document Did Close")
+    pass
 
 
 @mr_server.feature(lsp.TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls, params: lsp.DidOpenTextDocumentParams):
-    """Text document did open notification."""
-    ls.show_message("Text Document Did Open")
+    pass
     _validate(ls, params)
 
 

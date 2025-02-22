@@ -1,0 +1,29 @@
+
+{test "~= and !~= pattern matching operators, basic patterns"
+    {import makrell.makrellpy.patmatch@[match]}
+    {import makrell.ast@[Identifier Number SquareBrackets String]}
+
+    {assert 2 ~= _}
+    {assert 2 ~= 2}
+    {assert 3 !~= 2}
+
+    {assert "a" ~= _}
+    {assert "a" ~= "a"}
+    {assert "a" !~= "b"}
+    {assert "a" !~= "_"}
+
+    {assert [] ~= []}
+    {assert [2] !~= []}
+    {assert [2] ~= [_]}
+    {assert [3] !~= [2]}
+
+    {assert [2 3] ~= [2 3]}
+    {assert [2 3] ~= [2 _]}
+    {assert [2 3 5] !~= []}
+    {assert [2 3 5] !~= [2 _]}
+
+    {assert [2 ["3" 5]] ~= [2 _]}
+    {assert [2 ["3" 5]] !~= [2 []]}
+    {assert [2 ["3" 5]] ~= [2 ["3" _]]}
+    {assert [2 ["3" 5]] ~= [2 ["3" 5]]}
+}

@@ -29,8 +29,10 @@ def import_mr_module(name: str, dest_module, alias: str | None = None) -> py.Mod
 
 
 def run_core_mr(cc: CompilerContext):
-    core_mr = get_src("core.mr")
+    core_mr = get_src("core.mrpy")
     cc.run(cc.operator_parse(regular(src_to_baseformat(core_mr))))
+    patmatch_mr = get_src("patmatch.mrpy")
+    cc.run(cc.operator_parse(regular(src_to_baseformat(patmatch_mr))))
 
 
 def get_mr_meta_assignment(cc: CompilerContext) -> py.Assign | None:
@@ -121,7 +123,7 @@ def exec_nodes(nodes: list[Node], filename: str | None = None) -> Any:
     if filename is None:
         filename = "<string>"
     # TODO: cmd line option to print the generated code
-    # print(py.unparse(m))
+    print(py.unparse(m))
     c = compile(m, filename, mode="exec")
     glob = {}
     init_py = \

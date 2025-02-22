@@ -153,6 +153,36 @@
     {assert y == 6}
 }
 
+{test "Function nested in function"
+    g = 5
+    {fun make_factoriser [factor]
+        {fun g [x]
+            x * factor
+        }
+        g
+    }
+    h = {make_factoriser 2}
+    y = {h 3}
+    {print g}
+    {assert g == 5}
+    {print y}
+    {assert y == 6}
+}
+
+{test "Lambda nested in function"
+    g = 5
+    {fun make_factoriser [factor]
+        g = x -> x * factor
+        g
+    }
+    h = {make_factoriser 2}
+    y = {h 3}
+    {print g}
+    {assert g == 5}
+    {print y}
+    {assert y == 6}
+}
+
 {test "If"
     a = {if true 1 2}
     {assert a == 1}

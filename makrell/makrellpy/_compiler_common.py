@@ -124,6 +124,7 @@ from makrell.tokeniser import regular
 from makrell.baseformat import operator_parse, src_to_baseformat
 """
         exec(src_init, self.globals)
+        # self.symbols['operator_parse'] = lambda ns: cc.operator_parse(ns)
 
     def run(self, nodes: list[Node]) -> Any:
         self.node_blocks += nodes
@@ -139,9 +140,12 @@ from makrell.baseformat import operator_parse, src_to_baseformat
         exec(c, self.globals, self.symbols)
 
     def meta_runnable_func(self, f):
-        syms = self.globals.copy()
-        syms.update(self.symbols.copy())
-        return types.FunctionType(f.__code__, globals=syms)
+        # syms = self.globals.copy()
+        # syms.update(self.symbols.copy())
+        # return types.FunctionType(f.__code__, globals=syms)
+        print("globals", self.globals.keys())
+        f.__globals__.update(self.globals)
+        return f
 
     def quote(self, n: Node, raw: bool = False) -> Node:
         # TODO: cleanup raw usage

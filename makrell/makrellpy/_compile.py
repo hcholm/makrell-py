@@ -67,7 +67,9 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                 else:
                     meta_args = nodes[2:]
                 f = cc.meta.symbols[n0.value]
-                mrf = cc.meta.meta_runnable_func(f)
+                mrf = f
+                print(f"mrf: calling {n0.value} {mrf}")
+                # mrf = cc.meta.meta_runnable_func(f)
                 result = mrf(meta_args)
                 
                 if isinstance(result, Node):

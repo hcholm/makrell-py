@@ -1,0 +1,197 @@
+{meta
+    {global _match_pattern_types}
+    _match_pattern_types = []
+
+    {fun match [ns]
+        {print "match" ns}
+        ns = ns | regular | operator_parse
+        testval = ns@0
+        {print "testval" testval testval|type}
+
+        {fun get_handler [pattern_node]
+            {for mp _match_pattern_types
+                name = mp@0
+                can_handle = mp@1
+                make_test = mp@2
+                handles_this = {can_handle pattern_node}
+                {when handles_this
+                    {print "get_handler" name pattern_node}
+                    {return make_test}
+                }
+            }
+            {print "No handler found for pattern " + pattern_node|str}
+            {raise "No handler found for pattern " + pattern_node|str}
+        }
+
+        {fun make_test_main [testval pattern]
+            handler = {get_handler pattern}
+            make_test = handler
+            {make_test testval pattern make_test_main}
+        }
+
+        cases = []  # cases in match expression
+        i = 1
+        {while i < {len ns} - 1
+            pattern = ns@i
+            retval = ns@(i+1)
+            tb = {make_test_main testval pattern}
+            test_node = tb@0
+            bindings = tb@1
+            {cases.append [test_node retval]}
+            i = i + 2
+        }
+
+        # list of test functions and return values as nodes
+        cases_node = {SquareBrackets
+            {map
+                case -> {SquareBrackets [
+                        {BinOp {SquareBrackets [{Identifier "tv"}]} "->" case@0}
+                        case@1
+                ]}
+                cases
+            } | list
+        }
+
+        n = {quote
+            {do
+                tv = {$ testval}
+                cases = {$ cases_node}
+                {for case cases
+                    f = case@0
+                    is_match = {f tv}
+                    {when is_match
+                        r = case@1
+                        {return r}
+                    }
+                }
+            }
+        }
+        n
+        # {quote -17}
+    }
+}
+
+
+{meta
+
+    _any_pattype = [] -> {do
+        can_handle = n -> {do
+            {print "can_handle" n}
+            r = {isinstance n Identifier} && n.value == "_"
+            {print "r" r}
+            r
+        }
+
+        make_test = [testval pattern next] -> [{quote true} []]
+
+        ["any_pattype" can_handle make_test]
+    }
+
+    _int_pattype = [] -> {do
+        can_handle = n -> {isinstance n Number}
+
+        make_test = [testval pattern next] -> [{quote
+            {do
+                {when {not {isinstance {$ testval} int}}
+                    {return false}}
+                {$ testval} == {$ pattern} 
+            }
+        } []]
+
+        ["int_pattype" can_handle make_test]
+    }
+
+    _string_pattype = [] -> {do
+        can_handle = n -> {isinstance n String}
+
+        make_test = [testval pattern next] -> [{quote
+            {do
+                {when {not {isinstance {$ testval} str}}
+                    {return false}}
+                {$ testval} == {$ pattern} 
+            }
+        } []]
+
+        ["string_pattype" can_handle make_test]
+    }
+
+    _type_pattype = [] -> {do
+        can_handle = pattern -> {isinstance pattern BinOp} && (pattern.op == ":")
+            && {isinstance pattern.right Identifier}
+
+        make_test = [testval pattern next] -> [{quote
+            {do
+                {isinstance {$ testval} {$ pattern.right}}
+            }
+        } []]
+
+        ["type_pattype" can_handle make_test]
+    }
+
+    _or_pattype = [] -> {do
+        can_handle = pattern -> ({isinstance pattern BinOp} && (pattern.op == "|"))
+
+        make_test = [testval pattern main] -> {do
+            left = {main testval pattern.left}@0
+            right = {main testval pattern.right}@0
+            test = {quote (({$ left}) || ({$ right}))}
+            [test []]
+        }
+
+        ["or_pattype" can_handle make_test]
+    }
+
+    _and_pattype = [] -> {do
+        can_handle = pattern -> ({isinstance pattern BinOp} && (pattern.op == "&"))
+
+        make_test = [testval pattern main] -> {do
+            left = {main testval pattern.left}@0
+            right = {main testval pattern.right}@0
+            test = {quote (({$ left}) && ({$ right}))}
+            [test []]
+        }
+
+        ["and_pattype" can_handle make_test]
+    }
+
+    _list_pattype = [] -> {do
+        can_handle = pattern -> {isinstance pattern SquareBrackets}
+
+        make_test = [testval pattern main] -> {do
+            pns = pattern.nodes | regular | operator_parse
+            len_pattern = {Number pns | len | str ""}
+            subtests = {quote true}
+            {for i {range {len pns}}
+                tv = {BinOp testval "@" {Number {str i} ""}}
+                p = pns@i
+                subtest = {main tv p}@0
+                subtests = {quote (({$ subtests}) && ({$ subtest}))}
+            }
+            test = {quote
+                {do
+                    {when {not {isinstance {$ testval} list}}
+                        {return false}}
+                    {when {len {$ testval}} != {$ len_pattern}
+                        {return false}}
+                    {$ subtests}
+                }
+            }
+            [test []]
+        }
+
+        ["list_pattype" can_handle make_test]
+    }
+
+    {global _match_pattern_types}
+    _match_pattern_types = [
+        {_type_pattype}
+        {_list_pattype}
+        {_or_pattype}
+        {_and_pattype}
+        {_string_pattype}
+        {_int_pattype}
+        {_any_pattype}
+    ]
+
+    {quote pass}
+}

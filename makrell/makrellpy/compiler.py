@@ -123,7 +123,7 @@ def exec_nodes(nodes: list[Node], filename: str | None = None) -> Any:
     if filename is None:
         filename = "<string>"
     # TODO: cmd line option to print the generated code
-    print(py.unparse(m))
+    # print(py.unparse(m))
     c = compile(m, filename, mode="exec")
     glob = {}
     init_py = \

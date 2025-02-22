@@ -3,10 +3,8 @@
     _match_pattern_types = []
 
     {fun match [ns]
-        {print "match" ns}
         ns = ns | regular | operator_parse
         testval = ns@0
-        {print "testval" testval testval|type}
 
         {fun get_handler [pattern_node]
             {for mp _match_pattern_types
@@ -15,7 +13,6 @@
                 make_test = mp@2
                 handles_this = {can_handle pattern_node}
                 {when handles_this
-                    {print "get_handler" name pattern_node}
                     {return make_test}
                 }
             }
@@ -75,12 +72,7 @@
 {meta
 
     _any_pattype = [] -> {do
-        can_handle = n -> {do
-            {print "can_handle" n}
-            r = {isinstance n Identifier} && n.value == "_"
-            {print "r" r}
-            r
-        }
+        can_handle = n -> {isinstance n Identifier} && n.value == "_"
 
         make_test = [testval pattern next] -> [{quote true} []]
 

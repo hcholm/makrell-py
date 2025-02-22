@@ -76,6 +76,18 @@ add3 = {add 3 _}
 # Operators as functions
 a = 2 | {+ 3} | {* 5}  # 25
 
+# Pattern matching, user extensible through metaprogramming
+{match a
+    2
+        "two"
+    [_ 3|5]
+        "list with two elements, second is 3 or 5"
+    _:str
+        "a string"
+    _ 
+        "something else"
+}
+
 # Custom operators with precedence levels
 {operator 😐 100
     $left + $right + 1}

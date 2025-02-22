@@ -1,29 +1,146 @@
 
-{test "~= and !~= pattern matching operators, basic patterns"
-    {import makrell.makrellpy.patmatch@[match]}
-    {import makrell.ast@[Identifier Number SquareBrackets String]}
+{test "match macro, simple values"
 
-    {assert 2 ~= _}
-    {assert 2 ~= 2}
-    {assert 3 !~= 2}
+    {assert
+        {match 2
+            3
+                "therr"
+        } == null
+        "no match"
+    }
 
-    {assert "a" ~= _}
-    {assert "a" ~= "a"}
-    {assert "a" !~= "b"}
-    {assert "a" !~= "_"}
+    {assert
+        {match 2
+            2
+                "two"
+        } == "two"
+        "2 to 2"
+    }
 
-    {assert [] ~= []}
-    {assert [2] !~= []}
-    {assert [2] ~= [_]}
-    {assert [3] !~= [2]}
+    {assert
+        {match 3
+            2
+                "two"
+            3
+                "three"
+            5
+                "five"
+        } == "three"
+        "3 to 2 3 5"
+    }
 
-    {assert [2 3] ~= [2 3]}
-    {assert [2 3] ~= [2 _]}
-    {assert [2 3 5] !~= []}
-    {assert [2 3 5] !~= [2 _]}
+    {assert
+        {match "asd"
+            "asd"
+                "qwe"
+        } == "qwe"
+        "'asd'"
+    }
 
-    {assert [2 ["3" 5]] ~= [2 _]}
-    {assert [2 ["3" 5]] !~= [2 []]}
-    {assert [2 ["3" 5]] ~= [2 ["3" _]]}
-    {assert [2 ["3" 5]] ~= [2 ["3" 5]]}
+    {assert
+        {match "asd"
+            "qwe"
+                "qwe"
+            _
+                "any"
+            "asd"
+                "asd"
+        } == "any"
+        "any"
+    }
+}
+
+{test "match lists"
+    {assert
+        {match []
+            []
+                "empty"
+        } == "empty"
+        "empty list"
+    }
+
+    {assert
+        {match [2 3]
+            []
+                "empty"
+            [2 3]
+                "2 3"
+        } == "2 3"
+        "[2 3]"
+    }
+
+    {assert
+        {match [2 3]
+            []
+                "empty"
+            [_]
+                "one"
+            [_ _]
+                "two"
+            [_ _ _]
+                "three"
+        } == "two"
+        "[2 3] to [_ _]"
+    }
+}
+
+{test "match or"
+    {assert
+        {match 7
+            2 | 3
+                "two or three"
+            5 | 7
+                "five or seven"
+            11 | 13
+                "eleven or thirteen"
+        } == "five or seven"
+        "7 to 5 | 7"
+    }
+}
+
+{test "match type"
+    {class Point []
+        {fun __init__ [self x y]
+            self.x = x
+            self.y = y
+        }
+        {fun __str__ [self]
+            {return "Point(" + {str self.x} + ", " + {str self.y} + ")"}
+        }
+    }
+
+    {assert
+        {match "asd"
+            _:str
+                "string"
+            _:Point
+                "Point object"
+        } == "string"
+        "_:str"
+    }
+
+    {assert
+        {match {Point 2 3}
+            _:str
+                "string"
+            _:Point
+                "Point object"
+            _:int
+                "int"
+        } == "Point object"
+        "Point object"
+    }
+}
+
+{test "match complex"
+
+    {assert
+        {match [2 3 5]
+            [2 3]
+                "2 3"
+            [_ 3|5 _]
+                "_ 3|5 _"
+        } == "_ 3|5 _"
+        "_ 3|5 _"
+    }
 }

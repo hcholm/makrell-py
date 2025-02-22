@@ -7,7 +7,7 @@
     }
 
     {async fun test_delay_value []
-        {assert {await {delay_value 42 2}} == 42 "42 == 42"}
+        {assert {await {delay_value 42 1}} == 42 "42 == 42"}
     }
 
     {asyncio.run {test_delay_value}}        

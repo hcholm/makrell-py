@@ -1,0 +1,18 @@
+{import asyncio}
+
+{async fun number_stream [limit]
+    i = 0
+    {while i < limit  
+        {await {asyncio.sleep 1}}
+        {yield i}
+        i = i + 1
+    }
+}
+
+{async fun main []
+    {async for _ {number_stream 5}
+        {print "Hello"}
+    }
+}
+
+{asyncio.run {main}}

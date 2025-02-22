@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='makrell',
-    version='0.8.1',
+    version='0.8.2',
     author='Hans-Christian Holm',
     author_email='jobb@hcholm.net',
     description='Makrell: A programming language family',
@@ -11,8 +11,8 @@ setup(
     url='https://github.com/hcholm/makrell-py',
     packages=find_packages(exclude=["tests*"]),
     package_data={
-        "makrell": ["*.mr"],
-        "makrell.makrellpy": ["*.mr"],
+        "makrell": ["*.mr", "*.mrpy"],
+        "makrell.makrellpy": ["*.mr", "*.mrpy"],
     },
     entry_points={
         'console_scripts': [

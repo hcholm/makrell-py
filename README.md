@@ -2,6 +2,8 @@
 
 <img src="./doc/makrell.png" style="width:10em" />
 
+![](https://github.com/hcholm/makrell-py/actions/workflows/sanity.yml/badge.svg)
+
 Makrell is a family of programming languages implemented in Python. It consists currently of these languages:
 
 * **MakrellPy**, a general-purpose, functional programming language with two-way Python interoperability, metaprogramming support and simple syntax.

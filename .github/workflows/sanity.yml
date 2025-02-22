@@ -1,0 +1,43 @@
+name: Test Makrell
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements.dev.txt ]; then pip install -r requirements.dev.txt; fi
+
+    - name: Install package
+      run: |
+        pip install .
+
+    - name: Test makrell import
+      run: |
+        python -c "import makrell; print('Makrell imported successfully')"
+
+    - name: Test makrell CLI
+      run: |
+        makrell --version
+
+    - name: Run tests
+      run: |
+        pip install pytest
+        pytest tests/makrellpy

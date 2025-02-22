@@ -31,7 +31,7 @@ jobs:
 
     - name: Test makrell import
       run: |
-        python -c "import mypackage; print('Makrell imported successfully')"
+        python -c "import makrell; print('Makrell imported successfully')"
 
     - name: Test makrell CLI
       run: |

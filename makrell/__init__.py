@@ -3,7 +3,9 @@ import importlib.machinery
 import os
 import sys
 import makrell.makrellpy.compiler as mrpy_compiler
+from importlib.metadata import version
 
+__version__ = version("makrell")
 
 class MakrellLoader(importlib.abc.SourceLoader):
 

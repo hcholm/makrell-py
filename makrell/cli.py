@@ -8,6 +8,7 @@ sys.path.append(root_dir)
 import importlib
 from makrell.makrellpy.compiler import exec_file, eval_src
 import makrell.makrellpy.repl as repl
+import makrell
 
 
 def print_help():
@@ -35,6 +36,10 @@ def main():
     
     if args[0] == "-h" or args[0] == "--help":
         print_help()
+        return
+
+    if args[0] == "-v" or args[0] == "--version":
+        print(f"Makrell: {makrell.__version__}")
         return
     
     if len(args) == 1:

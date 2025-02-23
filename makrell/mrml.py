@@ -51,7 +51,7 @@ def parse_element(n: Node, parent: ET.Element | None = None, allow_exec: bool = 
             if isinstance(ar, CurlyBrackets):
                 if allow_exec and len(ar.nodes) >= 1 and get_identifier(ar.nodes[0], "$"):
                     ns = regular(ar.nodes[1:])
-                    print(f"exec attr ns: {ns}")
+                    # print(f"exec attr ns: {ns}")
                     value = str(eval_nodes(operator_parse(ns)[0]))
                 else:
                     raise Exception("Expected attribute value")

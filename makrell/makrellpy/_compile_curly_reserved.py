@@ -69,6 +69,7 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
             
         case "fun":
             if parlen >= 2:
+                # print("fun", nodes)
                 name = nodes[1].value
                 args = py.arguments(args=[py.arg(n.value) for n in regular(nodes[2])],
                                     posonlyargs=[], kwonlyargs=[], kw_defaults=[], defaults=[])
@@ -394,6 +395,22 @@ def compile_curly_reserved(n: CurlyBrackets, cc: CompilerContext, compile_mr, op
             return pb.pass_()
         
         case "quote":
+            # q_mr = cc.meta.quote(regular(flatten(nodes[1]))[0])
+            # print("quote", nodes, len(nodes))
+
+            # TODO: handle multiple quotes
+            # q_ns = regular(flatten(nodes[1:]))
+            # # q_ns = q_ns[:1]
+            # if len(q_ns) > 1:
+            #     print("quote multiple", q_ns, len(q_ns))
+            #     print(q_ns[0], type(q_ns[0]))
+            #     q_mr = [cc.meta.quote(n)[0] for n in q_ns]
+            #     print("q_mr", q_mr, len(q_mr))
+            #     q_py = [c(q) for q in q_mr]
+            #     print("q_py", q_py, len(q_py))
+            #     print(q_py[0].id)
+            #     return q_py
+
             q_mr = cc.meta.quote(regular(flatten(nodes[1]))[0])
             q_py = c(q_mr)
             return q_py

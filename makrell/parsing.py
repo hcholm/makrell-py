@@ -104,7 +104,7 @@ def baseformat_value(n: Node) -> Node:
 
 
 def pyast_value(n: Node) -> py.AST | None:
-    print("pyast_value", n)
+    # print("pyast_value", n)
     if get_string(n):
         s = n.value[1:-1]  # type: ignore
         match n.suffix:  # type: ignore

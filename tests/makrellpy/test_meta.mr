@@ -34,6 +34,14 @@
     {assert q == {CurlyBrackets [{Identifier "f"}]}}
 }
 
+# TODO
+# {test "Quote multiple values"
+#     {exec "from makrell.ast import Number, SquareBrackets"}
+#     q = {quote 2 3}
+#     {print q|type q}
+#     {assert q == [{Number "2" ""} {Number "3" ""}]}
+# }
+
 {test "Quote unquote"
     {exec "from makrell.ast import Number"}
     q = {quote {unquote 2}}
@@ -313,3 +321,15 @@
     {assert c == 117}
 }
 
+# TODO
+# {test "Multi-node macro"
+#     {def macro m [ns]
+#         {quote
+#             a = 2
+#             a = a + 3
+#         }
+#     }
+#     {m}
+#     {print a}
+#     {assert a == 5 "a should be 5"}
+# }

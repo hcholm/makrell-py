@@ -47,7 +47,7 @@ def e_string_to_baseformat(s: str) -> Node:
         raise Exception("Unmatched brackets")
     if from_ < len(s):
         segments.append(s[from_:])
-    print("segments", segments)
+    # print("segments", segments)
 
     nodes = []
     for segment in segments:
@@ -60,7 +60,7 @@ def e_string_to_baseformat(s: str) -> Node:
             nodes.append(Operator("+"))
         nodes.append(n)
 
-    print("estr nodes", regular(flatten(nodes)))
+    # print("estr nodes", regular(flatten(nodes)))
     # assert False
     return RoundBrackets(nodes)
 

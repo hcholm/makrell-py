@@ -6,13 +6,16 @@ from makrell.ast import (
 from makrell.baseformat import (
     Associativity, default_precedence_lookup, operator_parse, src_to_baseformat)
 from makrell.tokeniser import regular
-from makrell.parsing import (Diagnostics, get_identifier)
+from makrell.parsing import (Diagnostics, flatten, get_identifier)
 
 
 def ensure_stmt(pa: py.AST) -> py.stmt:
     if isinstance(pa, py.stmt):
         return pa
     e = py.Expr(cast(py.expr, pa))
+    # print("ensure_stmt", pa, type(pa), e, type(e))
+    # if not hasattr(pa, "__dict__"):
+    #     return e    
     if "lineno" not in pa.__dict__:  # macro nodes don't have position info, TODO: fix
         return e
     e.lineno = pa.lineno  # type: ignore
@@ -23,6 +26,7 @@ def ensure_stmt(pa: py.AST) -> py.stmt:
 
 
 def stmt_wrap(ns: list[py.AST], auto_return: bool = True) -> list[py.stmt]:
+    # print("stmt_wrap", ns, type(ns))
     if ns == []:
         return [py.Return(py.Constant(None))]
     return [
@@ -127,12 +131,15 @@ from makrell.baseformat import operator_parse, src_to_baseformat
         # self.symbols['operator_parse'] = lambda ns: cc.operator_parse(ns)
 
     def run(self, nodes: list[Node]) -> Any:
+        # print("running meta", len(nodes))
         self.node_blocks += nodes
         self.cc.running_in_meta = True
         pyast = self.cc.compile_mr(Sequence(nodes), self.cc)
         self.cc.running_in_meta = False
         if not isinstance(pyast, list):
             pyast = [pyast]
+        pyast = flatten(pyast)
+        # print("pyast", pyast)
         pyast = self.cc.fun_defs[0] + pyast
         body = py.Module(stmt_wrap(pyast, auto_return=False), type_ignores=[])
         py.fix_missing_locations(body)
@@ -143,7 +150,7 @@ from makrell.baseformat import operator_parse, src_to_baseformat
         # syms = self.globals.copy()
         # syms.update(self.symbols.copy())
         # return types.FunctionType(f.__code__, globals=syms)
-        print("globals", self.globals.keys())
+        # print("globals", self.globals.keys())
         f.__globals__.update(self.globals)
         return f
 

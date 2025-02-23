@@ -122,6 +122,11 @@
     {print a}
     {assert a == 5}
 
+    minus_from2 = {- 2}
+    a = {minus_from2 3}
+    {print a}
+    {assert a == -1}
+
     a = 2 | {+ 3} | {* 5}
     {print a}
     {assert a == 25}

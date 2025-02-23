@@ -1,7 +1,7 @@
 {import makrell.ast@[Number]}
 
 #  replace expression with the item count
-{macro macroa [ns]
+{def macro macroa [ns]
     ns = {regular ns}
     {print "COMPILE-TIME MACROA There are" {len ns} "items here"}
     count = {len ns}
@@ -10,7 +10,7 @@
 }
 
 #  replace expression with the item number 15
-{macro macrob [ns]
+{def macro macrob [ns]
     ns = {regular ns}
     count = {len ns}
     {print "COMPILE-TIME MACROB" count}

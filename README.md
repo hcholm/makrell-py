@@ -13,6 +13,8 @@ Makrell is a family of programming languages implemented in Python. It consists 
 
 The project is in an early stage of development and is not yet ready for production use.
 
+Website and documentation: **[makrell.dev](https://makrell.dev)**
+
 Community: **[Chat on Gitter](https://app.gitter.im/#/room/#makrell:gitter.im)**
 
 ## Quick Start
@@ -103,7 +105,7 @@ b | print
 {assert b == 6}
 
 # A macro that composes a sequence of functions
-{macro pipe [ns]
+{def macro pipe [ns]
     ns = {regular ns}
     p = ns@0
     i = 1

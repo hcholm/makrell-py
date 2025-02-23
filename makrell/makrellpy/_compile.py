@@ -56,6 +56,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
         if get_identifier(n0):
             # reserved word
             r = compile_curly_reserved(n, cc, compile_mr, opp_nodes)
+            # print("r", r, type(r))
             if r:
                 return r
             
@@ -70,6 +71,7 @@ def compile_mr(n: Node, cc: CompilerContext) -> py.AST | list[py.AST] | None:
                 mrf = f
                 # mrf = cc.meta.meta_runnable_func(f)
                 result = mrf(meta_args)
+                # print(f"result: {result}")
                 
                 if isinstance(result, Node):
                     return c(result)

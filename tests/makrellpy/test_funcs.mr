@@ -21,6 +21,17 @@
     {assert actual == null}
 }
 
+{test "Do blocks have their own scope"
+    b = 2
+    a = {do
+        b = 3
+        b * b
+    }
+    {print a b}
+    {assert a == 9}
+    {assert b == 2}
+}
+
 {test "Do blocks with multiple statements and a return"
     actual = {do
         x = 2

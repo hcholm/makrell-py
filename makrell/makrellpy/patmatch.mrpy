@@ -35,7 +35,8 @@
         {while i < {len ns} - 1
             pattern = ns@i
             retval = ns@(i+1)
-            tb = {make_test_main testval pattern}
+            # tb = {make_test_main testval pattern}
+            tb = {make_test_main {quote tv} pattern}
             test_node = tb@0
             bindings = tb@1
             {cases.append [test_node retval]}
@@ -53,9 +54,22 @@
             } | list
         }
 
-        n = {quote
-            {do
-                tv = {$ testval}
+        # n = {quote
+        #     {do
+        #         tv = {$ testval}
+        #         cases = {$ cases_node}
+        #         {for case cases
+        #             f = case@0
+        #             is_match = {f tv}
+        #             {when is_match
+        #                 r = case@1
+        #                 {return r}
+        #             }
+        #         }
+        #     }
+        # }
+        n = {quote 
+            {tv -> {do
                 cases = {$ cases_node}
                 {for case cases
                     f = case@0
@@ -65,7 +79,7 @@
                         {return r}
                     }
                 }
-            }
+            } {$ testval}}
         }
         n
     }

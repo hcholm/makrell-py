@@ -129,17 +129,18 @@ Note:
 See the [examples](examples) and [tests](tests) directories for examples of the following features:
 * Class definitions
 * String interpolation
-* Function composition
-* Meta programming, including macros, custom operators and embedded mini-languages
+* Functional programming
+* Pattern matchings
+* Metaprogramming, including macros, custom operators and embedded mini-languages
 * Python interoperability
 
 ### TODOs, wishlist and ideas
 
 * More built-in functions, operators, data types etc.
 * Fix bugs
-* Various missing Python features, such as decorators, yield and async/await
+* Various missing Python features, such as decorators
 * Basic typing or type hints as in Python
-* Pattern matching and destructuring
+* Destructuring assignment
 * More advanced typing, possibly with inference and unified with pattern matching and grammar expressions in some mini-language
 * Better error messages and better IDE support
 * More documentation and examples

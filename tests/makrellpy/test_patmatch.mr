@@ -270,3 +270,9 @@
     {assert m == "$.x < 3" "$.x < 3"}
 }
 
+{test "match short form"
+    {assert {match 2 2} "2 2"}
+    {assert not \ {match 2 3} "2 3"}
+    {assert {match [2 3] [_  $ > 2 & $ < 5]} "[2 3]"}
+    {assert not \ {match [2 5] [_  $ > 2 & $ < 5]} "[2 5]"}
+}

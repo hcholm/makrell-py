@@ -4,6 +4,11 @@
 
     {fun match [ns]
         ns = ns | regular | operator_parse
+        # short form {match testval pattern}
+        ns = {if {len ns} == 2
+            ns + [{quote true}]
+            ns
+        }
         testval = ns@0
 
         {fun get_handler [pattern_node]
@@ -216,4 +221,18 @@
     ]
 
     {quote pass}
+}
+
+{def macro ismatch [ns]
+    ns = ns | regular | operator_parse
+    testval = ns@0
+    pattern = ns@1
+    {quote
+        {match {$ testval}
+            {$ pattern}
+                true
+            _
+                false
+        }
+    }
 }

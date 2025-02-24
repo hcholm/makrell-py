@@ -176,11 +176,30 @@
     _self_pattype = [] -> {do
         can_handle = pattern -> {isinstance pattern Identifier} && pattern.value == "$"
 
-        make_test = [testval pattern main] -> {do
-            [testval []]
-        }
+        make_test = [testval pattern main] -> [testval []]
 
         ["self_pattype" can_handle make_test]
+    }
+
+    _any_binop_pattype = [] -> {do
+        can_handle = n -> {isinstance n BinOp}
+
+        make_test = [testval pattern next] -> {do
+            interpolate_self = n ->
+                {if
+                    {isinstance n Identifier} && n.value == "$"
+                        testval
+                    {isinstance n BinOp}
+                        {BinOp {interpolate_self n.left} n.op {interpolate_self n.right}}
+                    n
+                }
+            left = {interpolate_self pattern.left}
+            right = {interpolate_self pattern.right}
+            test = {BinOp left pattern.op right}
+            [test []]
+        }
+
+        ["any_binop" can_handle make_test]
     }
 
     {global _match_pattern_types}
@@ -192,6 +211,7 @@
         {_and_pattype}
         {_string_pattype}
         {_int_pattype}
+        {_any_binop_pattype}
         {_any_pattype}
     ]
 

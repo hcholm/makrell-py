@@ -187,3 +187,86 @@
         "[null]"
     }
 }
+
+{test "match any binop"
+
+    {assert
+        {match 0
+            2 > 3
+                "2 > 3"
+            2 < 3
+                "2 < 3"
+            _
+                "other"
+        } == "2 < 3"
+        "2 < 3"
+    }
+
+    {assert
+        {match 2
+            $ > 3
+                "$ > 3"
+            $ < 3
+                "$ < 3"
+            _
+                "other"
+        } == "$ < 3"
+        "$ < 3"
+    }
+}
+
+{test "match and"
+
+    {assert
+        {match 2
+            _:str & $ < 3
+                "str < 3"
+            _:int & $ < 3
+                "int < 3"
+            _
+                "other"
+        } == "int < 3"
+        "int < 3"
+    }
+
+}
+
+{test "match complex"
+    {class Point []
+        {fun __init__ [self x y]
+            self.x = x
+            self.y = y
+        }
+        {fun __str__ [self]
+            {return "Point(" + {str self.x} + ", " + {str self.y} + ")"}
+        }
+    }
+    
+    {assert
+        {match {Point 2 3}
+            _:str & $ < 3
+                "str < 3"
+            _:Point & $.x > 3
+                "$.x > 3"
+            _:Point & $.x < 3
+                "$.x < 3"
+            _
+                "other"
+        } == "$.x < 3"
+        "$.x < 3"
+    }
+    
+    m = {match [2 {Point 2 3} "asd"]
+        _:int & $ < 3
+            "str < 3"
+        [_  _:Point & $.x > 3  _]
+            "$.x > 3"
+        [_  _:Point & $.x < 3  _]
+            "$.x < 3"
+        _
+            "other"
+    }
+    m | print
+    {assert m == "$.x < 3" "$.x < 3"}
+}
+

@@ -144,3 +144,46 @@
         "_ 3|5 _"
     }
 }
+
+{test "match self truthy"
+
+    {assert
+        {match true
+            $
+                "self"
+            _
+                "other"
+        } == "self"
+        "true"
+    }
+
+    {assert
+        {match false
+            $
+                "self"
+            _
+                "other"
+        } == "other"
+        "false"
+    }
+
+    {assert
+        {match []
+            $
+                "self"
+            _
+                "other"
+        } == "other"
+        "[]"
+    }
+
+    {assert
+        {match [null]
+            $
+                "self"
+            _
+                "other"
+        } == "self"
+        "[null]"
+    }
+}

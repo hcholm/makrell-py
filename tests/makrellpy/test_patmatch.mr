@@ -258,7 +258,7 @@
     
     m = {match [2 {Point 2 3} "asd"]
         _:int & $ < 3
-            "str < 3"
+            "int < 3"
         [_  _:Point & $.x > 3  _]
             "$.x > 3"
         [_  _:Point & $.x < 3  _]

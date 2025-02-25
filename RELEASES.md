@@ -26,7 +26,10 @@ Also, new website up at https://makrell.dev .
 * partial application
 * function composition
 * conditional expressions
+* a variety of literal values
 * multiline lambda
 * two-way Python interop
+* LSP server
+* VS Code extension
 
 

@@ -129,29 +129,12 @@ Note:
 See the [examples](examples) and [tests](tests) directories for examples of the following features:
 * Class definitions
 * String interpolation
-* Functional programming
-* Pattern matchings
-* Metaprogramming, including macros, custom operators and embedded mini-languages
+* A variety of literal values
+* Async/await
+* More functional programming features
+* More metaprogramming features
 * Python interoperability
-
-### TODOs, wishlist and ideas
-
-* More built-in functions, operators, data types etc.
-* Fix bugs
-* Various missing Python features, such as decorators
-* Basic typing or type hints as in Python
-* Destructuring assignment
-* More advanced typing, possibly with inference and unified with pattern matching and grammar expressions in some mini-language
-* Better error messages and better IDE support
-* More documentation and examples
-* Compilers and code generators for other languages and platforms
-* A composable query language for heterogeneous sources, such as databases, object structures, web services etc.
-* Mini-languages for regular expressions and BNF
-* An API for traversing and transforming MBF trees
-* A templating language
-* A website with tutorials, documentation and a playground
-* Implementations in other languages
-
+* LSP (Language Server Protocol) support
 
 ## MRON
 

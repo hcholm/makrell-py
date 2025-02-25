@@ -104,20 +104,33 @@ b = 2 | {*_* 3}
 b | print
 {assert b == 6}
 
-# A macro that composes a sequence of functions
-{def macro pipe [ns]
-    ns = {regular ns}
-    p = ns@0
-    i = 1
-    {while i < {len ns}
-        p = {quote {unquote p} | {unquote ns@i}}
-        i = i+1
-    }
-    p
+# a macro that evaluates expressions in reverse order
+{def macro reveval [ns]
+    ns = ns | regular | operator_parse
+    {print "[Compile time] Reversing {ns | len} expressions"e}
+
+    [{quote {print "This expression is added to the code"}}]
+    + (ns | reversed | list)
 }
-f = [x] -> x * 2
-mul = [x y] -> x * y
-c = {pipe 3 f f {mul 10 _} f f}  # 480
+
+{print "Starting"}
+{reveval
+    "a is now {a}"e | print
+    a = a + 3
+    "a is now {a}"e | print
+    a = 2
+}
+{print a}  # 5
+{print "Done"}
+
+# Output:
+# [Compile time] Reversing 4 expressions
+# Starting
+# This expression is added to the code
+# a is now 2
+# a is now 5
+# 5
+# Done
 ```
 
 Note:

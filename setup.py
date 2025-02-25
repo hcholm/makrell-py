@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='makrell',
-    version='0.9.0',
+    version='0.9.1',
     author='Hans-Christian Holm',
     author_email='jobb@hcholm.net',
     description='Makrell: A programming language family',

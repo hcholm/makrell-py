@@ -4,7 +4,7 @@
 {import makrell.baseformat@[src_to_baseformat]}
 
 {fun run []
-    {print "Makrell 0.8.0"}
+    {print "Makrell 0.9.1"}
     
     globals_ = {dict}
     locals_ = {dict}

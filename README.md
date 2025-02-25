@@ -93,14 +93,14 @@ a = 2 | {+ 3} | {* 5}  # 25
 }
 
 # Custom operators with precedence levels
-{operator 😐 100
+{operator *_* 100
     $left + $right + 1}
-{operator 😵 90
+{operator *+* 90
     $left - $right}
-a = 2 😵 3 😐 5
+a = 2 *+* 3 *_* 5
 a | print
 {assert a == -7}
-b = 2 | {😐 3}
+b = 2 | {*_* 3}
 b | print
 {assert b == 6}
 

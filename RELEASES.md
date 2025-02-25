@@ -2,9 +2,9 @@
 # News about releases and related matters
 
 
-## v0.9.0
+## v0.9.1
 
-2025-02
+2025-02-25
 
 * multi-branch if expressions
 * pattern matching

@@ -35,7 +35,6 @@
         {while i < {len ns} - 1
             pattern = ns@i
             retval = ns@(i+1)
-            # tb = {make_test_main testval pattern}
             tb = {make_test_main {quote tv} pattern}
             test_node = tb@0
             bindings = tb@1
@@ -54,20 +53,6 @@
             } | list
         }
 
-        # n = {quote
-        #     {do
-        #         tv = {$ testval}
-        #         cases = {$ cases_node}
-        #         {for case cases
-        #             f = case@0
-        #             is_match = {f tv}
-        #             {when is_match
-        #                 r = case@1
-        #                 {return r}
-        #             }
-        #         }
-        #     }
-        # }
         n = {quote 
             {tv -> {do
                 cases = {$ cases_node}
@@ -235,18 +220,4 @@
     ]
 
     {quote pass}
-}
-
-{def macro ismatch [ns]
-    ns = ns | regular | operator_parse
-    testval = ns@0
-    pattern = ns@1
-    {quote
-        {match {$ testval}
-            {$ pattern}
-                true
-            _
-                false
-        }
-    }
 }

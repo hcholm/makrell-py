@@ -276,3 +276,23 @@
     {assert {match [2 3] [_  $ > 2 & $ < 5]} "[2 3]"}
     {assert not \ {match [2 5] [_  $ > 2 & $ < 5]} "[2 5]"}
 }
+
+# {test "match regular"
+
+#     m = {match [2 3 5]
+#         {$r 2*(0..3) 3 $rest}
+#             "two"
+#         {$r (0..3)'2 3 $rest}
+
+#         {$r $some'2 3 $rest}
+
+#         {$r $some'2 3 $rest}
+
+#         {$r 3*(2 | 3 | some*5) maybe*3 some*5 a=(any*7 | some*(2 3 5))}
+
+#             "three"
+#         5
+#             "five"
+#     }
+
+# }

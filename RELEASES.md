@@ -6,6 +6,7 @@
 
 2025-02
 
+* multi-branch if expressions
 * pattern matching
 * async/await
 

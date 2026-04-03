@@ -1,3 +1,7 @@
+# The MakrellPy repository is now moved to a mono-repo at https://github.com/hcholm/makrell-omni
+
+---
+
 # Makrell 
 
 <img src="./doc/makrell.png" style="width:10em" />
